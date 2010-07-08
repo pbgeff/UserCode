@@ -57,7 +57,7 @@ void event_dump(Event_Tree *evt2, int num_removed, float* ht_vec, float ht, TLor
 
 const float pi = 3.141592653589;
 
-void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, int jet_smear_flag=0, int z_smear=0)
+void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, int which_file=1, int jet_smear_flag=0, int z_smear=0)
 {
 
   gRandom->SetSeed(0);
@@ -71,10 +71,12 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
 
   //test==0 usual sample
   //test==1 N-jet sample where any jet can be removed
+  //test==2 N-jet sample where any jet can be removed, alternate values
 
   //soft==0 usual sample
   //soft==1 add in soft jets
-  //soft==2 add in soft jets; account for Z mass; Not implemented right now
+  //soft==2 add in soft jets, alternate values  
+  //soft==? add in soft jets; account for Z mass; Not implemented right now
   //soft==3 add in soft jets and then tighten Z and jet cuts
 
   //z_smear==0 usual
@@ -83,7 +85,8 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
   //z_smear==3 smear Z pt and phi
 
   //jet_smear_flag==0 usual
-  //jet_smear_flag==1 smear pt of one jet 
+  //jet_smear_flag==1 smear pt of jets 
+  //jet_smear_flag==2 smear pt of jets, alternate values
 
   //n_jet==-1 >=2-jet with no Z
   //n_jet==-2 2-jet with no Z
@@ -109,25 +112,24 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
   //if(sample==5) {input = new TFile("CMS_MC.root"); hist_file = new TFile("hists_cms_mc.root","RECREATE");} //big Z sample
   if(sample==5) {input = new TFile("CMS_MC_oldZmumu_800pb.root"); hist_file = new TFile("hists_cms_mc.root","RECREATE");} //800 pb-1 sample
   if(sample==6)  {input = new TFile("CMS_phojet_MC.root"); hist_file = new TFile("hists_cms_mc_pho.root","RECREATE"); pho_sample=1; jet_quality=1;}  //gamma+jets MinBias MC sample
-  if(sample==7)  {input = new TFile(/*"CMS_phojet_data.root"*//*"CMS_phojet_data_EG_Run2010A-PromptReco-v1_RECO.root"*/"CMS_phojet_data_EG_Run2010A-PromptReco-v2_RECO.root"); hist_file = new TFile("hists_cms_data_pho.root","RECREATE"); pho_sample=1; jet_quality=1;}  //gamma+jets MinBias data sample
+  if(sample==7)  {input = new TFile(/*"CMS_phojet_data.root"*//*"CMS_phojet_data_Commissioning10-SD_EG-v9.root"*//*"CMS_phojet_data_EG_Jun9thReReco_v1.root"*//*"CMS_phojet_data_EG_12nb.root"*//*"CMS_phojet_data_MinBias_TuneD6T_7TeV-pythia6_Spring10-START3X_V26B-v2_GEN-SIM-RECO.root"*//*"CMS_phojet_15_data_EG_12nb.root"*//*"CMS_phojet_15_data_EG_Run2010A-PromptReco-v4.root"*/"CMS_phojet_15_data_EG_26nb.root"); hist_file = new TFile("hists_cms_data_pho.root","RECREATE"); pho_sample=1; jet_quality=1;}  //gamma+jets MinBias data sample
   if(sample==-1)  {input = new TFile("CMS_jets_MC.root"/*"CMS_QCD_MC_Pthat30toInf.root"*/); hist_file = new TFile("hists_cms_mc_jets.root","RECREATE"); jet_quality=1;}  //dijet MinBias MC sample
   if(sample==-2)  {input = new TFile("CMS_jets_data.root"); hist_file = new TFile("hists_cms_data_jets.root","RECREATE"); jet_quality=1;}  //dijet MinBias data sample
-  if(sample==-3)  {input = new TFile(/*"CMS_jets_data_new.root"*/"CMS_jets_data_JetMETTau_Run2010A-PromptReco-v1_RECO.root"/*"CMS_jets_data_JetMETTau_Run2010A-PromptReco-v2_RECO.root"*/); hist_file = new TFile("hists_cms_data_jets.root","RECREATE"); jet_quality=1;}  //dijet data sample
-  //if(sample==-3)  {input = new TFile("CMS_bjets_MC.root"); hist_file = new TFile("hists_cms_mc_jets.root","RECREATE"); jet_quality=1; bjet_sample=1;}  //dijet MinBias MC sample; >=1 bjet
+  if(sample==-3)  {input = new TFile(/*"CMS_jets_data_new.root"*//*"CMS_jets_data_Commissioning10-SD_JetMETTau-v9.root"*//*"CMS_jets_data_JMT_Jun9thReReco_v1.root"*/"CMS_jets_data_JetMETTau_12nb.root"/*"CMS_JPTjets_data_JetMETTau_12nb.root"*//*"CMS_PFjets_data_JetMETTau_12nb.root"*//*"CMS_PFjets_pt10_data_JMT_Jun9thReReco_v1.root"*/); hist_file = new TFile("hists_cms_data_jets.root","RECREATE"); jet_quality=1;}  //dijet data sample
   if(sample==-4)  {input = new TFile("CMS_bjets_data.root"); hist_file = new TFile("hists_cms_data_jets.root","RECREATE"); jet_quality=1; bjet_sample=1;}  //dijet MinBias data sample; >=1 bjet 
   if(sample==-5)  {
-                   input = new TFile("CMS_QCD_MC_v9.root"); 
+    //               input = new TFile("CMS_QCD_MC_v9.root"); 
     //               input = new TFile("CMS_QCD_MC_Pt100to250.root"); 
     //               input = new TFile("CMS_QCD_MC_Pt250to500.root"); 
     //               input = new TFile("CMS_QCD_MC_Pt500to1000.root");
     //               input = new TFile("CMS_QCD_MC_Pt1000toInf.root");
-    //               input = new TFile("CMS_QCD_MC_Pthat30toInf.root");
+                   input = new TFile("CMS_QCD_MC_Pthat30toInf.root");
     //               input = new TFile("CMS_QCD_MC_Pthat15toInf.root");
 	  	     hist_file = new TFile("hists_cms_MC_jets.root","RECREATE"); jet_quality=1;}  //QCD MC sample
 
   TFile* graph1, *graph2;
-  if(n_jet==-2 || n_jet==1) graph1 = new TFile("graph_1.root","RECREATE");  
-  if(n_jet==-5 || n_jet==5) graph2 = new TFile("graph_2.root","RECREATE");  
+  if(which_file==1) graph1 = new TFile("graph_1.root","RECREATE");  
+  if(which_file==2) graph2 = new TFile("graph_2.root","RECREATE");  
 
   TH1F *h_alphaT = new TH1F("h_alphaT","#alpha_{T}",60,0.,3.);
   TH1F *h_alphaT_ht_20_40 = new TH1F("h_alphaT_ht_20_40","#alpha_{T}, 20<H_{T}<40",60,0.,3.);
@@ -158,11 +160,11 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
   TH1F *h_jet_fRBX = new TH1F("h_jet_fRBX","Jet fRBX",40,0,1.0);
   TH1F *h_jet_fHPD = new TH1F("h_jet_fHPD","Jet fHPD",40,0,1.0);
   TH1F *h_jet_n90Hits = new TH1F("h_jet_n90Hits","Jet n90Hits",100,0,100);
-  TH1F *h_jet_emf = new TH1F("h_jet_emf","Jet EMF",60,-1.0,1.0);
-  TH1F *h_jet_btag_jetProb = new TH1F("h_jet_btag_jetProb","Jet btag_jetProb",30,0,3.0);
+  TH1F *h_jet_emf = new TH1F("h_jet_emf","Jet EMF",100,-1.0,1.0);
+  TH1F *h_jet_btag_jetProb = new TH1F("h_jet_btag_jetProb","Jet btag_jetProb",100,0,1.0);
   TH1F *h_jet_pt_btag = new TH1F("h_jet_pt_btag","Jet pt, b-Tagged jets",50,0,400.);
 
-  TH1F *h_pho_pt = new TH1F("h_pho_pt","Photon Pt",40,0,200.);
+  TH1F *h_pho_pt = new TH1F("h_pho_pt","Photon Pt",100,0,25./*,40,0,200*/);
   TH1F *h_pho_phi = new TH1F("h_pho_phi","Photon phi",20,-pi,pi);
   TH1F *h_pho_eta = new TH1F("h_pho_eta","Photon Eta",16,-4.,4.);
   TH1F *h_pho_E1overE3x3 = new TH1F("h_pho_E1overE3x3","Photon maxEnergyXtal/e3x3",50,0,1.);
@@ -186,6 +188,8 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
   TProfile* p_ht_vs_htplusmet = new TProfile("p_ht_vs_htplusmet","HT vs HT+MET",100,0,1000);
   TH2F *h_ht_vs_genht = new TH2F("h_ht_vs_genht","HT vs genHT",1000,0,1000,1000,0,1000);
   TProfile* p_ht_vs_genht = new TProfile("p_ht_vs_genht","HT vs genHT",100,0,1000);
+  TH1F *h_Npv = new TH1F("h_Npv","Number of Primary Verticies",20,0,20.);
+  TH1F *h_Npv_good = new TH1F("h_Npv_good","Number of good Primary Verticies",20,0,20.);
 
   TH1F *h_phojet_balance = new TH1F("h_phojet_balance","Photon Pt/Jet Pt",30,0,3.);
   TH1F *h_dijet_balance = new TH1F("h_dijet_balance","Jet Pt/Jet Pt",30,0,3.);
@@ -201,7 +205,6 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
   Event_Tree evt = Event_Tree((TTree*)input->Get("Event_Tree")); 
   Photon_Tree pho_tr = Photon_Tree((TTree*)input->Get("Photon_Tree")); 
   Event_Tree *evt2;
-
 
   //Number of events to loop over
   Int_t nentries = (Int_t)evt.fChain->GetEntriesFast();
@@ -225,15 +228,16 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
   //z_pt_min=10; jet_pt_min=10; leadjet_pt_min=10; //lower cuts to 10 GeV as a check
   //z_pt_min=15; jet_pt_min=15; leadjet_pt_min=15; //lower cuts to 15 GeV as a check
   //z_pt_min=20; jet_pt_min=20; leadjet_pt_min=20; //lower cuts to 20 GeV as a check
-  z_pt_min=40; jet_pt_min=40; leadjet_pt_min=40; //cuts to 40 GeV
+  //z_pt_min=40; jet_pt_min=40; leadjet_pt_min=40; //cuts to 40 GeV
   //z_pt_min=50; jet_pt_min=50; leadjet_pt_min=50; //cuts to 50 GeV 
   //z_pt_min=75; jet_pt_min=75; leadjet_pt_min=75; //cuts to 75 GeV 
   //z_pt_min=100; jet_pt_min=100; leadjet_pt_min=100; //cuts to 100 GeV 
-  if(sample==-3) {z_pt_min=40; jet_pt_min=40; leadjet_pt_min=40;} //cuts to 40 GeV cout<<"\n"<<z_pt_min<<" "<<jet_pt_min;
+  if(sample==-3 || sample==-5) {z_pt_min=40; jet_pt_min=40; leadjet_pt_min=40;} //cuts to 40 GeV cout<<"\n"<<z_pt_min<<" "<<jet_pt_min;
   if(sample==-2) {z_pt_min=20; jet_pt_min=20; leadjet_pt_min=20;} //cuts to 20 GeV
-  if(sample==7 && mode==-1) {z_pt_min=10; jet_pt_min=10; leadjet_pt_min=10; }
-  if(sample==7 && mode==-2) {z_pt_min=15; jet_pt_min=15; leadjet_pt_min=15; }
-
+  if(sample==7 && mode==-2) {z_pt_min=10; jet_pt_min=10; leadjet_pt_min=10; }
+  if(sample==7 && mode==-1) {z_pt_min=18; jet_pt_min=18; leadjet_pt_min=18; }
+  //z_pt_min=18; jet_pt_min=18; leadjet_pt_min=18;
+  //z_pt_min=50; jet_pt_min=50; leadjet_pt_min=50;
 
   float btag_cut = 0.5;
   int min_num_jets;
@@ -299,6 +303,8 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
     evt.GetEntry(ia);
     pho_tr.GetEntry(ia);
 
+    //if(evt.num_vert>1) continue; //only take events with certain number of verticies
+    //if(evt.run>135802) continue; 
 
     //Only look at events with genHT in specific range
     //if(evt.rawmet<120 || evt.rawmet>150) continue; 
@@ -335,11 +341,12 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
 	 if(fabs(pho_tr.pho_eta[i]) > 1.4/*3.0*/) { removed_pho=1; continue;}
 	 if(pho_tr.pho_maxEnergyXtal[i]/pho_tr.pho_e3x3[i] > 0.9) { removed_pho=1; continue;}
 	 if(pho_tr.pho_sigmaIetaIeta[i]<0.002) { removed_pho=1; continue;} 
+	 
 	 //if(pho_tr.pho_sigmaIetaIeta[i]>0.015) { removed_pho=1; continue;} //Only cut her for central photons
-	 //if(pho_tr.pho_sigmaIetaIeta[i]<0.01948 && pho_tr.pho_sigmaIetaIeta[i]>0.01943) { removed_pho=1; continue;}  //strange peaks in sigmaIetaIeta corresponding to fakes
-	 //if(pho_tr.pho_sigmaIetaIeta[i]<0.01941 && pho_tr.pho_sigmaIetaIeta[i]>0.01937) { removed_pho=1; continue;} //strange peaks in sigmaIetaIeta corresponding to fakes
-	 //if(pho_tr.pho_sigmaIetaIeta[i]<0.0247 && pho_tr.pho_sigmaIetaIeta[i]>0.0246) { removed_pho=1; continue;}  //strange peaks in sigmaIetaIeta corresponding to fakes 
 	 if(pho_pass==0) {
+	   //pho_tr.pho_et[i] += (pho_tr.pho_isoEcalRecHitDR04[i]+pho_tr.pho_isoHcalRecHitDR04[i]);  //Add in isolation energy to the photon
+	   pho_tr.pho_px[i] = pho_tr.pho_et[i]*cos(pho_tr.pho_phi[i]);
+	   pho_tr.pho_py[i] = pho_tr.pho_et[i]*sin(pho_tr.pho_phi[i]);
 	                  //pho_tr.pho_et[i] *= 2; pho_tr.pho_px[i]*= 2;  pho_tr.pho_py[i]*= 2;  pho_tr.pho_pz[i]*= 2;
            	          DiMuon.SetXYZM(pho_tr.pho_px[i],pho_tr.pho_py[i],pho_tr.pho_pz[i],0); pho_pass=1; pho_index=i; //save photon
 	 }
@@ -361,15 +368,21 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
       jet_smear_et[ijet][0]= smear_jet_et(evt.jet_et[ijet],0); //saved true jet et
       //jet_smear_et[ijet][0] *= 1.2; //change jet energy scale
       //evt.jet_et[ijet] *= 0.8; //change jet energy scale
-      /*
-      float temp_pt=evt.jet_et[ijet];
-      if(temp_pt<jet_pt_min) continue;
-      if(gRandom->Uniform(0,1)<0.5) evt.jet_et[ijet] = smear_jet_et(evt.jet_et[ijet],1); //smear jets //*****************
-      else { evt.jet_et[ijet] = smear_jet_et(evt.jet_et[ijet],8);  smear_flag++; }                        //smear jets //*****************
-      //cout<<"\n"<<temp_pt<<" "<<evt.jet_et[ijet];
-      if(evt.jet_et[ijet]<jet_pt_min) evt.jet_et[ijet]=temp_pt;  
-      */    
-      //if(evt.jet_et[ijet]<jet_pt_min) continue;                                          //smear jets //*****************
+      if(jet_smear_flag){  //Jet smearing
+	float temp_pt=evt.jet_et[ijet];
+	if(temp_pt<jet_pt_min) continue;
+	if(jet_smear_flag==1) {
+	  if(gRandom->Uniform(0,1)<0.9) evt.jet_et[ijet] = smear_jet_et(evt.jet_et[ijet],1);     //smear jet with 10% gaussian 90% of the time
+	  else { evt.jet_et[ijet] = smear_jet_et(evt.jet_et[ijet],8);  smear_flag++; }                        //smear jet downward with 50% gaussian 10% of the time
+	}
+	if(jet_smear_flag==2) {
+	  if(gRandom->Uniform(0,1)<0.5) evt.jet_et[ijet] = smear_jet_et(evt.jet_et[ijet],1);     //smear jet with 10% gaussian 50% of the time
+	  else { evt.jet_et[ijet] = smear_jet_et(evt.jet_et[ijet],8);  smear_flag++; }                        //smear jet downward with 50% gaussian 50% of the time
+	}
+	//cout<<"\n"<<temp_pt<<" "<<evt.jet_et[ijet];
+	if(evt.jet_et[ijet]<jet_pt_min) evt.jet_et[ijet]=temp_pt;   //reset jet to original pt if smeared below threshold   
+	//if(evt.jet_et[ijet]<jet_pt_min) continue;                          
+      }  //Jet smearing
       /*
       jet_smear_et[ijet][1]= smear_jet_et(evt.jet_et[ijet],1); //saved smeared jet et
       jet_smear_et[ijet][2]= smear_jet_et(evt.jet_et[ijet],2); //saved smeared jet et
@@ -384,6 +397,20 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
     //if(!smear_flag) continue; 
 
 
+    /*
+    //For event dump
+    if(evt.event==43711304 && evt.run==136066){
+      //////// //event dump
+      float ht_vect[2] = {0,0};
+      evt2=&evt;
+      event_dump(evt2,0,ht_vect,0,DiMuon);
+      //////////
+      dump_counter++;
+      //if(dump_counter>5) exit(0);
+    }
+    */
+
+
     int temp_numjets = 0;
     int num_bjets = 0;
     float temp_emf=-999;
@@ -395,6 +422,8 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
 	  float dphi = deltaphi(pho_tr.pho_phi[pho_index],evt.jet_phi[ijet]);
 	  float deta = fabs(evt.jet_eta[ijet] - pho_tr.pho_eta[pho_index]);
 	  float dR = sqrt(pow(dphi,2)+pow(deta,2));
+	  //cout<<"\n"<<pho_tr.pho_phi[pho_index]<<" "<<evt.jet_phi[ijet]<<" "<<evt.jet_eta[ijet]<<" "<<pho_tr.pho_eta[pho_index];
+	  //cout<<"\n"<<dR;
 	  if(dR < 0.2) {
 	    evt.jet_remove[ijet]=1;  /*removed_jet=1;*/ 
 	    //h_phopt_vs_jetpt_overlap->Fill(pho_tr.pho_et[pho_index],evt.jet_et[ijet],weight2);
@@ -409,11 +438,12 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
 	    continue;
 	  } //photon overlaps jet
 	}
-	//if(evt.jet_emf[ijet]>0.9999) { evt.jet_remove[ijet]=1; continue;} //spike cleanup
 	if(evt.jet_et[ijet]<jet_pt_min)   { evt.jet_remove[ijet]=1; continue;} //remove jets below pt cut
-	if(evt.jet_et[ijet]>jet_pt_min) //jet fails
-	if(fabs(evt.jet_eta[ijet]) > 3.0 || evt.jet_fRBX[ijet]>0.98 || evt.jet_n90Hits[ijet]<=1 || (evt.jet_emf[ijet]<0.01 && fabs(evt.jet_eta[ijet])<2.6 )) { evt.jet_remove[ijet]=1; removed_jet=1; continue;} 
-	//jet doesn't fail
+	if(evt.jet_et[ijet]>jet_pt_min) { 
+	  if(fabs(evt.jet_eta[ijet]) > 3.0 || evt.jet_fHPD[ijet]>0.98 || evt.jet_n90Hits[ijet]<=1 || (evt.jet_emf[ijet]<0.01 && fabs(evt.jet_eta[ijet])<2.6 )) { evt.jet_remove[ijet]=1; removed_jet=1; continue;}  //calo jets
+	  //if(fabs(evt.jet_eta[ijet]) > 2.0 || evt.jet_fHPD[ijet]>0.98 || evt.jet_n90Hits[ijet]<=1 /*|| evt.jet_emf[ijet]<0.01*/) { evt.jet_remove[ijet]=1; removed_jet=1; continue;}  //Jpt jets	
+	  //if(fabs(evt.jet_eta[ijet]) > 3.0 || evt.jet_fHPD[ijet]/evt.jet_E[ijet]>=0.99 || evt.jet_fHPD[ijet]/evt.jet_E[ijet]>=0.99 || evt.jet_emf[ijet]/evt.jet_E[ijet]>=0.99 || ((evt.jet_n90Hits[ijet]<=0.01 || evt.jet_btag_jetProb[ijet]<=0.01) && fabs(evt.jet_eta[ijet])<2.4 )) { evt.jet_remove[ijet]=1; removed_jet=1; continue;}  //PF jets
+	}
 	if(evt.jet_remove[ijet]==0) temp_numjets++;	
 	if(evt.jet_btag_jetProb[ijet]>btag_cut) num_bjets++;
       }
@@ -432,7 +462,9 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
 	if(ia>=18550849) weight1=weight2 = 0.000075; 
       }
     }
-    
+   
+    if(mode==-2) weight1=weight2=1; 
+ 
     /*
     if(mode==-1) { //Set weightings for histograms; No Z mass cut
       weight1=weight2=1; 
@@ -458,9 +490,13 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
       h_jet_eta->Fill(evt.jet_eta[ijet],weight1);
       h_jet_fRBX->Fill(evt.jet_fRBX[ijet],weight1);
       h_jet_fHPD->Fill(evt.jet_fHPD[ijet],weight1);
+      //h_jet_fRBX->Fill(evt.jet_fRBX[ijet]/evt.jet_E[ijet],weight1);
+      //h_jet_fHPD->Fill(evt.jet_fHPD[ijet]/evt.jet_E[ijet],weight1);
       h_jet_n90Hits->Fill(evt.jet_n90Hits[ijet],weight1);
       h_jet_emf->Fill(evt.jet_emf[ijet],weight1);
       h_jet_btag_jetProb->Fill(evt.jet_btag_jetProb[ijet],weight1);
+      //h_jet_emf->Fill(evt.jet_emf[ijet]/evt.jet_E[ijet],weight1);
+      //h_jet_btag_jetProb->Fill(evt.jet_btag_jetProb[ijet]/evt.jet_E[ijet],weight1);
       if(evt.jet_btag_jetProb[ijet]>btag_cut) h_jet_pt_btag->Fill(evt.jet_et[ijet],weight1);
     }
     //Fill photon histograms
@@ -552,9 +588,11 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
 	if(evt.jet_remove[ijet]==1 || evt.jet_et[ijet]<jet_pt_min) continue;
 	//if(gRandom->Uniform()>0.80) { evt.jet_remove[ijet]=1; num_removed++;} //remove 20% of all jets 
 	//if(gRandom->Uniform()>0.75) { evt.jet_remove[ijet]=1; num_removed++;} //remove 25% of all jets 
-	if(gRandom->Uniform()>0.67) { evt.jet_remove[ijet]=1; num_removed++;} //remove 33% of all jets
+	if(test==1) if(gRandom->Uniform()>0.67) { evt.jet_remove[ijet]=1; num_removed++;} //remove 33% of all jets
 	//if(gRandom->Uniform()>0.55) { evt.jet_remove[ijet]=1; num_removed++;} //remove 45% of all jets
 	//if((evt.jet_et[ijet]-jet_pt_min)/(200.-2*jet_pt_min)+0.5<gRandom->Uniform())  { evt.jet_remove[ijet]=1; num_removed++;} //remove 50% of jets at threshold to 0% of jets at 100 GeV
+	if(test==2) if((evt.jet_et[ijet]-jet_pt_min)/(400.-2*jet_pt_min)+0.5<gRandom->Uniform())  { evt.jet_remove[ijet]=1; num_removed++;} //remove 50% of jets at threshold to 0% of jets at 200 GeV
+	//if(test==2) if((evt.jet_et[ijet]-jet_pt_min)/(200.-jet_pt_min)*(1.0-0.35)+0.35<gRandom->Uniform())  { evt.jet_remove[ijet]=1; num_removed++;} //remove 25% of jets at threshold to 0% of jets at 200 GeV
 	//if((evt.jet_et[ijet]-jet_pt_min)/(100.-2*jet_pt_min)+0.5<gRandom->Uniform())  { evt.jet_remove[ijet]=1; num_removed++;} //remove 50% of jets at threshold to 0% of jets at 50 GeV
 	//if((evt.jet_et[ijet]-jet_pt_min)/(2*500.-2*jet_pt_min)+0.5<gRandom->Uniform())  { evt.jet_remove[ijet]=1; num_removed++;} //remove 50% of jets at threshold to 0% of jets at 500 GeV
 	//if(fabs(evt.jet_phi[ijet]) < 1.5 && fabs(evt.jet_eta[ijet])<1.0) { evt.jet_remove[ijet]=1; num_removed++;}  //remove jets with eta in [-1,1] and phi in [0,1.5] 
@@ -596,13 +634,15 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
     }
     h_ht->Fill(njet_ht,weight1);
     h_mht->Fill(sqrt(pow(njet_htvec[0],2)+pow(njet_htvec[1],2)),weight1);
-    //h_met->Fill(evt.met);
+    h_met->Fill(evt.met);
     h_genht->Fill(evt.rawmet,weight1);
     h_ht_vs_htplusmet->Fill(njet_ht+evt.met,njet_ht,weight2);
     p_ht_vs_htplusmet->Fill(njet_ht+evt.met,njet_ht,weight1);
     h_ht_vs_genht->Fill(evt.rawmet,njet_ht,weight2);
     p_ht_vs_genht->Fill(evt.rawmet,njet_ht,weight1); 
-/*
+    /*
+    //To study the strange properties of photons in the early data
+    //They have lower energy than the jets in pho+1jet events
     if(num_passing_jets==2) { h_phojet_balance->Fill(sqrt(pow(jet_pt[0][0],2)+pow(jet_pt[0][1],2))/sqrt(pow(jet_pt[1][0],2)+pow(jet_pt[1][1],2)),weight1);
                               if(gRandom->Uniform(0,1)>0.5) h_dijet_balance->Fill(sqrt(pow(jet_pt[0][0],2)+pow(jet_pt[0][1],2))/sqrt(pow(jet_pt[1][0],2)+pow(jet_pt[1][1],2)),weight1);
                               else h_dijet_balance->Fill(sqrt(pow(jet_pt[1][0],2)+pow(jet_pt[1][1],2))/sqrt(pow(jet_pt[0][0],2)+pow(jet_pt[0][1],2)),weight1);
@@ -621,7 +661,7 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
 			      if(evt.met<20) h_dphi_phomet_met0to20->Fill(fabs(deltaphi(evt.met_phi,DiMuon.Phi())),weight1);
 			      if(evt.met>20) h_dphi_phomet_met20toinf->Fill(fabs(deltaphi(evt.met_phi,DiMuon.Phi())),weight1);
     }
-*/
+    */
     //cout<<"\n"<<njet_mht;
     //cout<<"\n"<<num_passing_jets;
     njet_mht = sqrt(pow(njet_htvec[0],2) + pow(njet_htvec[1],2)); 
@@ -629,11 +669,12 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
     if(num_passing_jets>max_num_jets+1) continue; //only consider events with a Z and less than or equal to maximum number of jets
     num_evts++;
     //Smear a jet ****
+    /*
     if(jet_smear_flag) {
       float temp_pt[2], smeared_pt;
       int smear_index=0; //Smear leading jet for now
       temp_pt[0] = jet_pt[smear_index][0]; temp_pt[1] = jet_pt[smear_index][1]; 
-      smeared_pt = smear_jet_et(sqrt(pow(temp_pt[0],2)+pow(temp_pt[1],2)),6/*7*//*2*/); //compute new pt
+      smeared_pt = smear_jet_et(sqrt(pow(temp_pt[0],2)+pow(temp_pt[1],2)),6); //compute new pt
       smeared_pt = sqrt(pow(temp_pt[0],2)+pow(temp_pt[1],2))*0.75;  //scale the pT of lead jet
       if(smeared_pt<jet_pt_min) continue;  //Make sure smeared_pt is above jet threshold
       //smeared_pt = 10;
@@ -644,6 +685,7 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
       njet_htvec[1] = njet_htvec[1] - temp_pt[1] + jet_pt[smear_index][1];
       njet_mht = sqrt(pow(njet_htvec[0],2) + pow(njet_htvec[1],2));               //recompute MHT
     }
+    */
     //End of smear a jet ****
     //soft jet stuff ****
     if(soft) { //Add soft jets right after N-jet system has been found and before computing DeltaHT
@@ -651,8 +693,8 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
       int softadded = 0; //number of soft jets added 
       //nsoft = (int) gRandom->Exp(1.5);
       //nsoft = (int) gRandom->Exp(2);
-      nsoft = (int) gRandom->Exp(3); //1,3,4
-      //nsoft = (int) gRandom->Exp(4);
+      if(soft==1) nsoft = (int) gRandom->Exp(3); //1,3,4
+      if(soft==2) nsoft = (int) gRandom->Exp(4);
       //nsoft = (int) gRandom->Exp(10); //6
       //nsoft = (int) gRandom->Exp(pow((ht_smear[i]-60)/30.,3)); //5
       while(softadded<nsoft) { //add multiple soft jets
@@ -661,13 +703,14 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
 	float soft_pt;
 	//soft_pt = leadjet_pt_min; //1
 	//soft_pt = gRandom->Exp(4);
-	soft_pt = gRandom->Exp(10); 
-	//soft_pt = gRandom->Exp(15); //3,6
-	//soft_pt = gRandom->Exp(20);
+	if(soft==1 && sample==7) soft_pt = gRandom->Exp(10);
+	if(soft==1 && sample==-3) soft_pt = gRandom->Exp(30);
+	if(soft==2 && sample==7) soft_pt = gRandom->Exp(15); //3,6
+	if(soft==2 && sample==-3) soft_pt = gRandom->Exp(20);
 	//soft_pt = gRandom->Exp(30); 
 	//soft_pt = gRandom->Gaus(30,10); //4
 	//soft_pt = gRandom->Gaus(pow((ht_smear[i]-60)/26.,4)/*ht_smear[i]/4.*/,1);  if(ht_smear[i]>120) soft_pt=30; //5
-	if(soft_pt>leadjet_pt_min) continue; //make sure jet is soft
+	if(soft_pt>jet_pt_min) continue; //make sure jet is soft
 	else softadded++;
 	float temp_htvec[2] = {0,0};
 	float temp_ht=0;
@@ -695,9 +738,9 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
 	njet_htvec[1] = temp_htvec[1];
 	njet_mht = sqrt(pow(njet_htvec[0],2) + pow(njet_htvec[1],2)); 
       } //add multiple soft jets
-      if(soft==3) { //tighten Z and jet cuts
+      if(soft/*==3*/) { //tighten Z and jet cuts
 	for(int j=0; j< num_passing_jets; j++) { 
-	  if(sqrt(pow(jet_pt[j][0],2)+pow(jet_pt[j][1],2)) < leadjet_pt_min+10) continue; //jet fails tighter pT
+	  if(sqrt(pow(jet_pt[j][0],2)+pow(jet_pt[j][1],2)) < jet_pt_min/*+10*/) continue; //jet fails tighter pT
 	}
       }
     }
@@ -747,7 +790,7 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
     njet_alphat = 0.5*(njet_ht-njet_deltaht)/sqrt(pow(njet_ht,2)-pow(njet_mht,2));
     offset = jet_pt_min*(min_num_jets) + z_pt_min; 
     bin_width = 10.0;
-    if(sample==-5) bin_width = 20;
+    if(sample==-5) bin_width = 10;
     max_ht = max_htbins*bin_width+offset;
     //if(sample==0) { bin_width = 10.0; max_ht = max_htbins*bin_width+offset; }
     //cout<<"\n"<<njet_ht<<" "<<njet_mht<<" "<<njet_deltaht<<" "<<njet_alphat;
@@ -797,19 +840,21 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
 
     h_measuredht->Fill(njet_ht,weight1);
     if(njet_alphat>0.55) h_measuredht_failalphat->Fill(njet_ht,weight1);
+    h_Npv->Fill(evt.num_vert,weight1);
+    h_Npv_good->Fill(evt.num_mu,weight1); //using num_mu temporarily to hold this information
 
     /*
     //For event dump
-    if(njet_alphat>0.55 && num_passing_jets>3){
+    if(njet_alphat>0.55 && njet_ht>180){
       //////// //event dump
       float ht_vect[2] = {njet_htvec[0],njet_htvec[1]};
       evt2=&evt;
       event_dump(evt2,0,ht_vect,njet_ht,DiMuon);
       //////////
       dump_counter++;
-      if(dump_counter>5) exit(0);
+      //if(dump_counter>5) exit(0);
     }
-    */
+    */    
 
 
 
@@ -916,30 +961,29 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
   if(sample==1 || sample==3) ndiv=4;
   if(sample==0) ndiv=4;
   if(sample==2 || sample==4) ndiv=2;
-  if(sample==6 || sample==7) ndiv=10;
+  if(sample==6 || sample==7) ndiv=12;
   if(sample==-1) ndiv= 10; //5;
   if(sample==-2) ndiv= 10; //6;
-  if(sample==-3) ndiv= 15;
+  if(sample==-3) ndiv= 20;
   if(sample==-4) ndiv=4;
   if(sample==-5) ndiv=max_htbins-1;
   double ratio_smear_small2[7][ndiv], yup_error_smear_small2[7][ndiv], ydown_error_smear_small2[7][ndiv];
   double x_smear_small2[7][ndiv], xerr_smear_small2[7][ndiv];
-  int first_nonzero_bin, last_nonzero_bin, last_nonzero_bin_flag; 
+  int first_nonzero_bin, last_nonzero_bin, last_nonzero_bin_num; 
 
   //compute ratios and errors
   for(int j=0; j<1 /*7*/; j++) { //loop through different smearings 
-    first_nonzero_bin = -10; last_nonzero_bin_flag = 0;
+    first_nonzero_bin = -10; 
     for(int i=0; i<max_htbins; i++) {
-      if(num_above_smear[j][i]>0 && first_nonzero_bin < 0) first_nonzero_bin = x_sum_smear[j][i]/num_total_smear[j][i];
-      if(num_above_smear[j][i]>0 && !last_nonzero_bin_flag) last_nonzero_bin = x_sum_smear[j][i]/num_total_smear[j][i];
-      if(num_above_smear[j][i]<=0) last_nonzero_bin_flag = 1;
-      if(i<ndiv) { ratio_smear_small2[j][i]=0; yup_error_smear_small2[j][i]=0; ydown_error_smear_small2[j][i]=0;}
+      if(num_above_smear[j][i]>0 && first_nonzero_bin < 0 && i<ndiv) first_nonzero_bin = x_sum_smear[j][i]/num_total_smear[j][i];
+      if(num_above_smear[j][i]>0 && i<ndiv) { last_nonzero_bin = x_sum_smear[j][i]/num_total_smear[j][i]; last_nonzero_bin_num = i+1; }
+      if(i<ndiv) { ratio_smear_small2[j][i]=0; yup_error_smear_small2[j][i]=1; ydown_error_smear_small2[j][i]=0;}
       if(i<6) { ratio_smear_small[j][i]=0; yup_error_smear_small[j][i]=1; ydown_error_smear_small[j][i]=0;}
       
       if(num_total_smear[j][i]<=0){ 
 	ratio_smear_small2[j][i]=0;
 	xerr_smear_small2[j][i] = 0;
-	yup_error_smear_small2[j][i]=0;
+	//yup_error_smear_small2[j][i]=0;
 	ydown_error_smear_small2[j][i]=0.0;
 	x_smear_small2[j][i] = offset + ((double) i + 0.5)*bin_width; //cout<<"\n"<<offset<<" "<<z_pt_min<<" "<<jet_pt_min;
       }
@@ -1002,6 +1046,7 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
 	  x_smear_small2[j][i] = x_sum_smear[j][i]/num_total_smear[j][i];
 	  ratio_smear_small2[j][i] = ratio_smear[j][i];
 	  yup_error_smear_small2[j][i] = error_smear[j][i];
+	  if(num_above_smear[j][i]<=0) yup_error_smear_small2[j][i] = (1.0/num_total_smear[j][i])/(1+1.0/num_total_smear[j][i]);
 	  if(ratio_smear[j][i]-error_smear[j][i]<0) ydown_error_smear_small2[j][i] = ratio_smear[j][i];
 	  else ydown_error_smear_small2[j][i]= error_smear[j][i];
 	}
@@ -1085,14 +1130,15 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
     gStyle->SetOptFit(0);
 
     if(1) {
-      TGraphAsymmErrors *g2_htvsfracabove55 = new TGraphAsymmErrors(ndiv,x_smear_small2[j],ratio_smear_small2[j],xerr_smear_small2[j],xerr_smear_small2[j],ydown_error_smear_small2[j],yup_error_smear_small2[j]);
+      TGraphAsymmErrors *g2_htvsfracabove55 = new TGraphAsymmErrors(last_nonzero_bin_num,x_smear_small2[j],ratio_smear_small2[j],xerr_smear_small2[j],xerr_smear_small2[j],ydown_error_smear_small2[j],yup_error_smear_small2[j]);
       char name1[64], name2[64], name3[64], name4[64], name5[64], name6[64];
       if(j==0) {
 	g2_htvsfracabove55->SetTitle("Fraction with #alpha_{T}>0.55 vs HT"); 
 	strcpy(name1,"g_htvsfracabove55_ba1.pdf"); strcpy(name2,"g_htvsfracabove55_ba2.pdf"); strcpy(name3,"g_htvsfracabove55_bb1.pdf"); strcpy(name4,"g_htvsfracabove55_bb2.pdf");
 	strcpy(name5,"g_htvsfracabove55_bc1.pdf"); strcpy(name6,"g_htvsfracabove55_bc2.pdf"); 
       }
-      
+   
+
       g2_htvsfracabove55->SetMarkerColor(4);
       g2_htvsfracabove55->SetMarkerStyle(21);
       g2_htvsfracabove55->Write();
@@ -1108,16 +1154,20 @@ void plot_maker(int sample, int n_jet=-1, int mode=-1, int test=0, int soft=0, i
       //g2_htvsfracabove55->Draw("ALP"); g2_htvsfracabove55->Fit(func1); c1->Print(name2);
       gStyle->SetOptFit(0);
       g2_htvsfracabove55->Draw("AP");   if(1) g2_htvsfracabove55->Fit(func2,"","",first_nonzero_bin,last_nonzero_bin);  g2_htvsfracabove55->GetYaxis()->SetRangeUser(0.0005,1);  c1->Print(name4);
-      if(j==0) { c1->SaveSource("g_htvsfracabove55_bb2.C"); if(n_jet==-2 || n_jet==1) graph1->cd(); if(n_jet==-5 || n_jet==5) graph2->cd();  g2_htvsfracabove55->Write(); hist_file->cd();}
+      if(j==0) { c1->SaveSource("g_htvsfracabove55_bb2.C"); if(which_file==1) graph1->cd(); if(which_file==2) graph2->cd();  g2_htvsfracabove55->Write(); }
       //g2_htvsfracabove55->Draw("ALP"); g2_htvsfracabove55->Fit(func3); c1->Print(name6);
       gStyle->SetOptFit(0);
     }
   } //loop through different smearings
 
+  //cout<<"\n\n"<<last_nonzero_bin<<" "<<last_nonzero_bin_num<<"\n\n";
+  //if(which_file==1) {graph1->Write(); graph1->Close();} 
+  //if(which_file==2) {graph2->Write(); graph2->Close();}
+  hist_file->cd();
 
   //  if(n_jet==-2 || n_jet==1) {graph1->Close(); graph1->Close();}
   // if(n_jet==-5 || n_jet==5) graph2->Close();
-  hist_file->Write();
+  //hist_file->Write();
 
   //  TCanvas* c1= new TCanvas();  
 
@@ -1146,7 +1196,7 @@ c1->SaveSource("g_htvsfracabove55_bb2.C");
   //  c1->SetLogy(); h_alphaT_ht_60_up->Draw(); c1->SaveSource("alphat1.C");
   //  c1->SetLogy(); h_alphaT_ht_40_80->Draw(); c1->SaveSource("alphat1.C");
   //  c1->SetLogy(); h_alphaT_ht_80_120->Draw(); c1->SaveSource("alphat2.C");
-
+  */
   
   c1->SetLogy(); h_alphaT_ht_20_40->Draw(); c1->Print("alphat_ht_20_402.pdf");  c1->SaveSource("alphat_ht_20_40.C");
   c1->SetLogy(); h_alphaT_ht_40_80->Draw(); c1->Print("alphat_ht_40_802.pdf");  c1->SaveSource("alphat_ht_40_80.C");
@@ -1158,10 +1208,11 @@ c1->SaveSource("g_htvsfracabove55_bb2.C");
   c1->SetLogy(); h_alphaT_ht_120_up->Draw(); c1->Print("alphat_ht_120_up2.pdf");  c1->SaveSource("alphat_ht_120_up.C");
   c1->SetLogy(); h_alphaT_ht_120_160->Draw(); c1->Print("alphat_ht_120_1602.pdf");  c1->SaveSource("alphat_ht_120_160.C");
   c1->SetLogy(); h_alphaT_ht_160_up->Draw(); c1->Print("alphat_ht_160_up2.pdf");  c1->SaveSource("alphat_ht_160_up.C");
+
+  
+  /*
   c1->SetLogy(0); h_alphaT_ht_150_200->Draw(); c1->Print("alphat_ht_150_2001.pdf"); 
   c1->SetLogy(); h_alphaT_ht_150_200->Draw(); c1->Print("alphat_ht_150_2002.pdf");
-  */
-  /*
   c1->SetLogy(0); h_alphaT_ht_200_250->Draw(); c1->Print("alphat_ht_200_2501.pdf"); 
   c1->SetLogy(); h_alphaT_ht_200_250->Draw(); c1->Print("alphat_ht_200_2502.pdf");
   c1->SetLogy(0); h_alphaT_ht_250_300->Draw(); c1->Print("alphat_ht_250_3001.pdf"); 
@@ -1177,10 +1228,10 @@ c1->SaveSource("g_htvsfracabove55_bb2.C");
   c1->SetLogy(0); h_jet_phi->Draw(); c1->Print("jet_phi.pdf");
   c1->SetLogy();  h_jet_num->Draw(); c1->Print("jet_num.pdf"); 
   c1->SetLogy(0); h_jet_eta->Draw(); c1->Print("jet_eta.pdf"); 
-  c1->SetLogy(0); h_jet_fRBX->Draw(); c1->Print("jet_fRBX.pdf"); 
-  c1->SetLogy(0); h_jet_fHPD->Draw(); c1->Print("jet_fHPD.pdf"); 
+  c1->SetLogy(); h_jet_fRBX->Draw(); c1->Print("jet_fRBX.pdf"); 
+  c1->SetLogy(); h_jet_fHPD->Draw(); c1->Print("jet_fHPD.pdf"); 
   c1->SetLogy();  h_jet_n90Hits->Draw(); c1->Print("jet_n90Hits.pdf"); 
-  c1->SetLogy(0); h_jet_emf->Draw(); c1->Print("jet_emf.pdf"); 
+  c1->SetLogy(); h_jet_emf->Draw(); c1->Print("jet_emf.pdf"); 
   c1->SetLogy();  h_jet_btag_jetProb->Draw(); c1->Print("jet_btag_jetProb.pdf"); 
   c1->SetLogy();  h_jet_pt_btag->Draw(); c1->Print("jet_pt_btag.pdf");
 
@@ -1204,6 +1255,8 @@ c1->SaveSource("g_htvsfracabove55_bb2.C");
   c1->SetLogy(0);  p_ht_vs_htplusmet->Draw(); c1->Print("ht_vs_htplusmet_profile.pdf"); 
   c1->SetLogy(0);  h_ht_vs_genht->Draw(); c1->Print("ht_vs_genht.pdf"); 
   c1->SetLogy(0);  p_ht_vs_genht->Draw(); c1->Print("ht_vs_genht_profile.pdf"); 
+  c1->SetLogy();  h_Npv->Draw(); c1->Print("Npv.pdf"); 
+  c1->SetLogy();  h_Npv_good->Draw(); c1->Print("Npv_good.pdf"); 
 
   c1->SetLogy();  h_measuredht->Draw(); c1->Print("ht_measured.pdf"); 
   c1->SetLogy();  h_measuredht_failalphat->Draw(); c1->Print("ht_measured_failalphat.pdf"); 
@@ -1211,8 +1264,7 @@ c1->SaveSource("g_htvsfracabove55_bb2.C");
   c1->SetLogy(0);  h_phopt_vs_jetpt_overlap->Draw(); c1->Print("phopt_vs_jetpt_overlap.pdf"); 
   c1->SetLogy(0); h_pho_isoEcalRecHitDR04_overlap->Draw(); c1->Print("pho_isoEcalRecHitDR04_overlap.pdf"); 
   c1->SetLogy(0);  h_jet_emf_overlap->Draw(); c1->Print("jet_emf_overlap.pdf"); 
-
-  c1->SetLogy(0);  h_phojet_balance->Draw(); c1->Print("phojet_balance.pdf"); 
+  c1->SetLogy(0);  h_phojet_balance->Draw(); c1->Print("phojet_balance.pdf"); c1->SaveSource("phojet_balance.C");
   c1->SetLogy(0);  h_dijet_balance->Draw(); c1->Print("dijet_balance.pdf"); 
   c1->SetLogy(0);  h_dphi_phomet->Draw(); c1->Print("dphi_phomet.pdf");
   c1->SetLogy(0);  h_dphi_phomet_met0to20->Draw(); c1->Print("dphi_phomet_met0to20.pdf"); 
@@ -1370,7 +1422,7 @@ void event_dump(Event_Tree* evt2, int num_removed, float* ht_vec, float ht, TLor
   for(int ijet=0; ijet<evt2->num_jet; ijet++) { //loop over jets
     n++;
     //if(evt2->jet_remove[ijet]==1) continue; //skip removed jets
-    cout<<"Jet "<<n<<": Px "<<evt2->jet_px[ijet]<<", Py "<<evt2->jet_py[ijet]<<", Pt "<<evt2->jet_et[ijet]<<", eta "<<evt2->jet_eta[ijet]<<", phi "<<evt2->jet_phi[ijet]<<", emf "<<evt2->jet_emf[ijet]<< /* ",  removed "<<evt2->jet_remove[ijet]<< */" \n";
+    cout<<"Jet "<<n<<": Px "<<evt2->jet_px[ijet]<<", Py "<<evt2->jet_py[ijet]<<", Pt "<<evt2->jet_et[ijet]<<", eta "<<evt2->jet_eta[ijet]<<", phi "<<evt2->jet_phi[ijet]<<", emf "<<evt2->jet_emf[ijet]<<  ",  removed "<<evt2->jet_remove[ijet]<< " \n";
   }
 
 

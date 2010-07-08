@@ -1,5 +1,5 @@
-#include "flat_maker_pho.hh" //Version 24 of cfA
-#include "inJSON.h" //For good run list
+#include "flat_maker_jets_v24.hh" //Version 24 of cfA
+#include "inJSON.h" //check "good" run/lumisection
 #include "TMath.h"
 #include "TFile.h"
 #include "TTree.h"
@@ -32,41 +32,23 @@ int flat_maker(){
 
   //Data
 /*
-  chainB->Add("/data01/cfA/EG_Run2010A-PromptReco-v1_RECO_UCSB0206_v24/cfA*.root/configurableAnalysis/eventB");
-  chainV->Add("/data01/cfA/EG_Run2010A-PromptReco-v1_RECO_UCSB0206_v24/cfA*.root/configurableAnalysis/eventV");
-  int MC_flag = 0;
-  output_filename="CMS_phojet_data_EG_Run2010A-PromptReco-v1_RECO.root";
-*/
-/*
-  chainB->Add("/data01/cfA/MinimumBias_Commissioning10-SD_EG-v9_RECO_UCSB0214_v24/cfA*.root/configurableAnalysis/eventB");
-  chainV->Add("/data01/cfA/MinimumBias_Commissioning10-SD_EG-v9_RECO_UCSB0214_v24/cfA*.root/configurableAnalysis/eventV");
-  int MC_flag = 0;
-  output_filename="CMS_phojet_data_MinimumBias_Commissioning10-SD_EG-v9_RECO.root";
-*/
-/*
-  chainB->Add("/data01/cfA/EG_Run2010A-PromptReco-v2_RECO_UCSB0215_v24/cfA*.root/configurableAnalysis/eventB");
-  chainV->Add("/data01/cfA/EG_Run2010A-PromptReco-v2_RECO_UCSB0215_v24/cfA*.root/configurableAnalysis/eventV");
-  int MC_flag = 0;
-  output_filename="CMS_phojet_data_EG_Run2010A-PromptReco-v2_RECO.root";
-*/
-/*
-  chainB->Add("/DataE/wto/nTuple370p2/EG_Jun9thReReco_v1/nTuple*.root/configurableAnalysis/eventB");
-  chainV->Add("/DataE/wto/nTuple370p2/EG_Jun9thReReco_v1/nTuple*.root/configurableAnalysis/eventV");
-  int MC_flag = 0;
-  output_filename="CMS_phojet_data_EG_Jun9thReReco_v1.root";
+  chainB->Add("/DataE/wto/nTuple370p2/JMT_Jun9thReReco_v1/nTuple*.root/configurableAnalysis/eventB");
+  chainV->Add("/DataE/wto/nTuple370p2/JMT_Jun9thReReco_v1/nTuple*.root/configurableAnalysis/eventV");
+  int MC_flag = 0; 
+  output_filename="CMS_JPTjets_data_JMT_Jun9thReReco_v1.root";
 */
 
-  chainB->Add("/DataE/wto/nTuple361p3/Commissioning10-SD_EG-v9/nTuple*.root/configurableAnalysis/eventB");
-  chainV->Add("/DataE/wto/nTuple361p3/Commissioning10-SD_EG-v9/nTuple*.root/configurableAnalysis/eventV");
-  int MC_flag = 0;
-  output_filename="CMS_phojet_data_Commissioning10-SD_EG-v9.root";
+  chainB->Add("/DataE/wto/nTuple361p3/Commissioning10-SD_JetMETTau-v9/nTuple*.root/configurableAnalysis/eventB");
+  chainV->Add("/DataE/wto/nTuple361p3/Commissioning10-SD_JetMETTau-v9/nTuple*.root/configurableAnalysis/eventV");
+  int MC_flag = 0; 
+  output_filename="CMS_JPTjets_data_Commissioning10-SD_JetMETTau-v9.root";
 
 
   //MC
   //chainB->Add("/data01/cfA/MinBias_Spring10-START3X_V26A_356ReReco-v1_GEN-SIM-RECO_UCSB0162_v20/cfA*.root/configurableAnalysis/eventB");
   //chainV->Add("/data01/cfA/MinBias_Spring10-START3X_V26A_356ReReco-v1_GEN-SIM-RECO_UCSB0162_v20/cfA*.root/configurableAnalysis/eventV");
   //int MC_flag = 1;
-  //output_filename="CMS_phojet_MC.root";
+  //output_filename="CMS_jets_MC.root";
 
 
   // Initializes both Trees, i.e. set all the branch addresses, etc.
@@ -80,11 +62,12 @@ int flat_maker(){
 
 
 
+
   //declare ntuple
   TTree* tree = new TTree("Event_Tree","Event Tree");    
   tree->Branch("run",&_run,"run/I");
   tree->Branch("event",&_event,"event/I");
-  tree->Branch("lumiblock",&_lumiblock,"lumiblock/I");	  
+  tree->Branch("lumiblock",&_lumiblock,"lumiblock/I");
   tree->Branch("met",&_met,"met/F");
   tree->Branch("metx",&_metx,"metx/F");
   tree->Branch("mety",&_mety,"mety/F");
@@ -188,6 +171,7 @@ int flat_maker(){
   tree->Branch("num_mu",&_num_mu,"num_mu/I");
 
 
+  /*
   //declare photon ntuple
   TTree* pho_tree = new TTree("Photon_Tree","Photon Tree");    
   pho_tree->Branch("run",&_run,"run/I");
@@ -208,15 +192,9 @@ int flat_maker(){
   pho_tree->Branch("pho_isoHollowTrkConeDR04",_pho_isoHollowTrkConeDR04,"pho_isoHollowTrkConeDR04[num_pho]/F");
   pho_tree->Branch("pho_maxEnergyXtal",_pho_maxEnergyXtal,"pho_maxEnergyXtal[num_pho]/F");
   pho_tree->Branch("pho_e3x3",_pho_e3x3,"pho_e3x3[num_pho]/F");
-
-  pho_tree->Branch("pho_sigmaIetaIeta",_pho_sigmaIetaIeta,"pho_sigmaIetaIeta[num_pho]/F");
-  pho_tree->Branch("pho_scPhiWidth",_pho_scPhiWidth,"pho_scPhiWidth[num_pho]/F");
-  pho_tree->Branch("pho_scEtaWidth",_pho_scEtaWidth,"pho_scEtaWidth[num_pho]/F");
-  pho_tree->Branch("pho_r9",_pho_r9,"pho_r9[num_pho]/F");
-
   pho_tree->Branch("pho_istight",_pho_istight,"pho_istight[num_pho]/I");
   pho_tree->Branch("pho_isloose",_pho_isloose,"pho_isloose[num_pho]/I");
-
+  */
 
 
 
@@ -249,12 +227,14 @@ int flat_maker(){
     chainB->GetEntry(ia);
     chainV->GetEntry(ia);
 
+
     //Physics Declared
     //if(!experimentType && !MC_flag) continue;
 
-    //Trigger Bits
+   //Trigger Bits
+    //if(!HLT_L1Jet6U) continue; //for JetMETTau Monitor sample
+    if(!HLT_Jet15U) continue; //for JetMETTau PD
     if(!L1Bit_0 || (!L1Bit_40 && !L1Bit_41)) continue;
-    if(!HLT_Photon10_L1R) continue;
     if(L1Bit_36 || L1Bit_37 || L1Bit_38 || L1Bit_39) continue; 
 
     //Require vertex
@@ -272,7 +252,8 @@ int flat_maker(){
 
 
     //Check good run list
-    if(!MC_flag && !inJSON(run,lumiblock)) continue;
+    if(MC_flag==0 && !inJSON(run,lumiblock)) continue; 
+
 
 
     _run = run;
@@ -310,13 +291,13 @@ int flat_maker(){
 
 
     //loop through jets
-    for (unsigned int k=0; k<jets_AK5_pt->size(); k++) {
-      if(jets_AK5_et->at(k)<10) continue;
-      //if(fabs(jets_AK5_eta->at(k))>3.0) continue;
+    for (unsigned int k=0; k<jets_AK5JPT_pt->size(); k++) {
+      if(jets_AK5JPT_et->at(k)<40/*10*/) continue;
+      //if(fabs(jets_AK5JPT_eta->at(k))>3.0) continue;
       //write out jet data
-      float et = jets_AK5_et->at(k);
-      float phi = jets_AK5_phi->at(k);
-      float eta = jets_AK5_eta->at(k);
+      float et = jets_AK5JPT_et->at(k);
+      float phi = jets_AK5JPT_phi->at(k);
+      float eta = jets_AK5JPT_eta->at(k);
       _jet_theta[_num_jet] = 2*atan(exp(fabs(eta)));
       _jet_et[_num_jet]= et;
       _jet_px[_num_jet]= et*cos(phi);
@@ -328,19 +309,18 @@ int flat_maker(){
       _jet_phi[_num_jet] = phi;
       _jet_E[_num_jet]=sqrt(_jet_et[_num_jet]*_jet_et[_num_jet]
 				+_jet_pz[_num_jet]*_jet_pz[_num_jet]);
-      _jet_emf[_num_jet]= jets_AK5_emf->at(k);
-      _jet_fHPD[_num_jet]= jets_AK5_fHPD->at(k);
-      _jet_fRBX[_num_jet]= jets_AK5_fRBX->at(k);
-      _jet_n90Hits[_num_jet]= jets_AK5_n90Hits->at(k);
-      _jet_btag_jetProb[_num_jet]= jets_AK5_btag_jetProb->at(k); 
+      _jet_emf[_num_jet]= jets_AK5JPT_emf->at(k);
+      _jet_fHPD[_num_jet]= jets_AK5JPT_fHPD->at(k);
+      _jet_fRBX[_num_jet]= jets_AK5JPT_fRBX->at(k);
+      _jet_n90Hits[_num_jet]= jets_AK5JPT_n90Hits->at(k);
+      _jet_btag_jetProb[_num_jet]= jets_AK5JPT_btag_jetProb->at(k);
       _jet_scalefac[_num_jet]= 1;
       _jet_remove[_num_jet]= 0;
       _num_jet++;
     }//loop through jets
 
 
-    
-    /* //Don't look at electrons or muons
+    /* //Don't consider electrons, photons, or muons
 
     //loop through electrons
     for (unsigned int k=0; k<els_pt->size(); k++) {
@@ -495,19 +475,18 @@ int flat_maker(){
       } // Muon is good enough to save
     } //loop through muons
 
-    */ //Don't look at electrons or muons
+
 
 
 
     //loop through photons
     for (unsigned int k=0; k<photons_et->size(); k++) {
       if(photons_et->at(k) <10) continue;
-      //if(fabs(photons_eta->at(k))>3.0 || photons_isEBGap->at(k) || photons_isEEGap->at(k) || photons_isEBEEGap->at(k)) continue; 
+      if(fabs(photons_eta->at(k))>3.0 || photons_isEBGap->at(k) || photons_isEEGap->at(k) || photons_isEBEEGap->at(k)) continue; 
       //if(photons_isEBPho->at(k) && photons_maxEnergyXtal->at(k)/photons_e3x3->at(k)>0.9) continue;  //spike rejection
 
       // First check loose
       LoosePho[k]=true;
-      if(photons_isEBGap->at(k) || photons_isEEGap->at(k) || photons_isEBEEGap->at(k)) LoosePho[k]=false;
       if(photons_hadOverEM->at(k)>0.1) LoosePho[k]=false;
       if(photons_isoEcalRecHitDR04->at(k)>8.0+0.004*photons_et->at(k)) LoosePho[k]=false;
       if(photons_isoHcalRecHitDR04->at(k)>8.0+0.002*photons_et->at(k)) LoosePho[k]=false;
@@ -515,7 +494,6 @@ int flat_maker(){
 
       // Then check tight
       TightPho[k]=true;
-      if(photons_isEBGap->at(k) || photons_isEEGap->at(k) || photons_isEBEEGap->at(k)) TightPho[k]=false;
       if(photons_hadOverEM->at(k)>0.05) TightPho[k]=false;
       if(photons_isoEcalRecHitDR04->at(k)>4.2+0.002*photons_et->at(k)) TightPho[k]=false;
       if(photons_isoHcalRecHitDR04->at(k)>4.0+0.001*photons_et->at(k)) TightPho[k]=false;
@@ -524,7 +502,6 @@ int flat_maker(){
 
       int tightPho=0; int loosePho=0; int triggerPho=0;
       if(TightPho[k]) tightPho=1; if(LoosePho[k]) loosePho=1;
-      triggerPho=1;
       //if(TightPho[k] || LoosePho[k]) triggerPho=1;
 
      if (tightPho || loosePho || triggerPho) { // Photon is good enough to save
@@ -546,22 +523,19 @@ int flat_maker(){
        _pho_hasPixelSeed[_num_pho] = photons_hasPixelSeed->at(k);
        _pho_maxEnergyXtal[_num_pho] = photons_maxEnergyXtal->at(k);
        _pho_e3x3[_num_pho] = photons_e3x3->at(k);
-       _pho_sigmaIetaIeta[_num_pho] = photons_sigmaIetaIeta->at(k);
-       _pho_scPhiWidth[_num_pho] = photons_scPhiWidth->at(k);
-       _pho_scEtaWidth[_num_pho] = photons_scEtaWidth->at(k);
-       _pho_r9[_num_pho] = photons_r9->at(k);
        _pho_istight[_num_pho] = tightPho;
        _pho_isloose[_num_pho] = loosePho;
        _num_pho++;
      } // Photon is good enough to save
     } //loop through photons
 
+    */ //Don't consider electrons, photons, or muons
 
 
     // Save this event
-    if (/*_num_mu==0 && _num_ele==0 &&*/ _num_jet>0 && _num_pho>0)  { //save event if at least one photon and at leaste one jet
+    if (/*_num_mu==0 && _num_ele==0 && _num_pho==0 && */ _num_jet>1)  { //save event if at least 2 jets
       tree->Fill();
-      pho_tree->Fill();
+      //pho_tree->Fill();
     }
 
   } //Main event loop
@@ -574,5 +548,4 @@ int flat_maker(){
 
 
 
-//Strange spikes in sigmaIetaIeta
-//t->Draw("pho_et","(pho_maxEnergyXtal/pho_e3x3)<0.9 && pho_istight && (pho_sigmaIetaIeta>0.01948 || pho_sigmaIetaIeta<0.01943) && (pho_sigmaIetaIeta>0.01941 || pho_sigmaIetaIeta<0.01937) && (pho_sigmaIetaIeta>0.0247 || pho_sigmaIetaIeta<0.0246) ")
+

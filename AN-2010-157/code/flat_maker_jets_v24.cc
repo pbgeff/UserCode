@@ -40,18 +40,24 @@ int flat_maker(){
   int MC_flag = 0;
   output_filename="CMS_jets_data.root";
 */
-
-  chainB->Add("/data01/cfA/JetMETTau_Run2010A-PromptReco-v1_RECO_UCSB0207_v24/cfA*.root/configurableAnalysis/eventB");
-  chainV->Add("/data01/cfA/JetMETTau_Run2010A-PromptReco-v1_RECO_UCSB0207_v24/cfA*.root/configurableAnalysis/eventV");
-  int MC_flag = 0;
-  output_filename="CMS_jets_data_JetMETTau_Run2010A-PromptReco-v1_RECO_newJSON.root";
-
 /*
   chainB->Add("/data01/cfA/JetMETTau_Run2010A-PromptReco-v2_RECO_UCSB0218_v24/cfA*.root/configurableAnalysis/eventB");
   chainV->Add("/data01/cfA/JetMETTau_Run2010A-PromptReco-v2_RECO_UCSB0218_v24/cfA*.root/configurableAnalysis/eventV");
   int MC_flag = 0;
   output_filename="CMS_jets_data_JetMETTau_Run2010A-PromptReco-v2_RECO.root";
 */
+/*
+  chainB->Add("/DataE/wto/nTuple370p2/JMT_Jun9thReReco_v1/nTuple*.root/configurableAnalysis/eventB");
+  chainV->Add("/DataE/wto/nTuple370p2/JMT_Jun9thReReco_v1/nTuple*.root/configurableAnalysis/eventV");
+  int MC_flag = 0; 
+  output_filename="CMS_jets_data_JMT_Jun9thReReco_v1.root";
+*/
+
+  chainB->Add("/DataE/wto/nTuple361p3/Commissioning10-SD_JetMETTau-v9/nTuple*.root/configurableAnalysis/eventB");
+  chainV->Add("/DataE/wto/nTuple361p3/Commissioning10-SD_JetMETTau-v9/nTuple*.root/configurableAnalysis/eventV");
+  int MC_flag = 0; 
+  output_filename="CMS_jets_data_Commissioning10-SD_JetMETTau-v9.root";
+
 
   //MC
   //chainB->Add("/data01/cfA/MinBias_Spring10-START3X_V26A_356ReReco-v1_GEN-SIM-RECO_UCSB0162_v20/cfA*.root/configurableAnalysis/eventB");

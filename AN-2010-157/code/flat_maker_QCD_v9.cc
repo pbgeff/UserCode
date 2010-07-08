@@ -1,5 +1,4 @@
-#include "flat_maker_pho.hh" //Version 24 of cfA
-#include "inJSON.h" //For good run list
+#include "flat_maker_QCD_v9.hh" //Version 9 of cfA
 #include "TMath.h"
 #include "TFile.h"
 #include "TTree.h"
@@ -21,7 +20,7 @@ using namespace std;
 
 double pi = 3.141592653589;
 
-int flat_maker(){
+int flat_maker(int sample){
 
   Int_t debug = 0;
 
@@ -31,42 +30,43 @@ int flat_maker(){
   TChain *chainV = new TChain("event");
 
   //Data
-/*
-  chainB->Add("/data01/cfA/EG_Run2010A-PromptReco-v1_RECO_UCSB0206_v24/cfA*.root/configurableAnalysis/eventB");
-  chainV->Add("/data01/cfA/EG_Run2010A-PromptReco-v1_RECO_UCSB0206_v24/cfA*.root/configurableAnalysis/eventV");
-  int MC_flag = 0;
-  output_filename="CMS_phojet_data_EG_Run2010A-PromptReco-v1_RECO.root";
-*/
-/*
-  chainB->Add("/data01/cfA/MinimumBias_Commissioning10-SD_EG-v9_RECO_UCSB0214_v24/cfA*.root/configurableAnalysis/eventB");
-  chainV->Add("/data01/cfA/MinimumBias_Commissioning10-SD_EG-v9_RECO_UCSB0214_v24/cfA*.root/configurableAnalysis/eventV");
-  int MC_flag = 0;
-  output_filename="CMS_phojet_data_MinimumBias_Commissioning10-SD_EG-v9_RECO.root";
-*/
-/*
-  chainB->Add("/data01/cfA/EG_Run2010A-PromptReco-v2_RECO_UCSB0215_v24/cfA*.root/configurableAnalysis/eventB");
-  chainV->Add("/data01/cfA/EG_Run2010A-PromptReco-v2_RECO_UCSB0215_v24/cfA*.root/configurableAnalysis/eventV");
-  int MC_flag = 0;
-  output_filename="CMS_phojet_data_EG_Run2010A-PromptReco-v2_RECO.root";
-*/
-/*
-  chainB->Add("/DataE/wto/nTuple370p2/EG_Jun9thReReco_v1/nTuple*.root/configurableAnalysis/eventB");
-  chainV->Add("/DataE/wto/nTuple370p2/EG_Jun9thReReco_v1/nTuple*.root/configurableAnalysis/eventV");
-  int MC_flag = 0;
-  output_filename="CMS_phojet_data_EG_Jun9thReReco_v1.root";
-*/
-
-  chainB->Add("/DataE/wto/nTuple361p3/Commissioning10-SD_EG-v9/nTuple*.root/configurableAnalysis/eventB");
-  chainV->Add("/DataE/wto/nTuple361p3/Commissioning10-SD_EG-v9/nTuple*.root/configurableAnalysis/eventV");
-  int MC_flag = 0;
-  output_filename="CMS_phojet_data_Commissioning10-SD_EG-v9.root";
-
+  //chainB->Add("/data01/cfA/MinimumBias_Commissioning10-PromptReco-v8_RECO_UCSB0164_v20/cfA*.root/configurableAnalysis/eventB");
+  //chainV->Add("/data01/cfA/MinimumBias_Commissioning10-PromptReco-v8_RECO_UCSB0164_v20/cfA*.root/configurableAnalysis/eventV");
+  //int MC_flag = 0;
+  //output_filename="CMS_jets_data.root";
 
   //MC
-  //chainB->Add("/data01/cfA/MinBias_Spring10-START3X_V26A_356ReReco-v1_GEN-SIM-RECO_UCSB0162_v20/cfA*.root/configurableAnalysis/eventB");
-  //chainV->Add("/data01/cfA/MinBias_Spring10-START3X_V26A_356ReReco-v1_GEN-SIM-RECO_UCSB0162_v20/cfA*.root/configurableAnalysis/eventV");
-  //int MC_flag = 1;
-  //output_filename="CMS_phojet_MC.root";
+  int MC_flag = 1;
+  if(sample==1) {
+    chainB->Add("/data03/cfA/QCD_Pt100to250-madgraph_Summer09-MC_31X_V3_7TeV-v2_GEN-SIM-RECO_UCSB0180_v9/cfA*.root/configurableAnalysis/eventB");
+    chainV->Add("/data03/cfA/QCD_Pt100to250-madgraph_Summer09-MC_31X_V3_7TeV-v2_GEN-SIM-RECO_UCSB0180_v9/cfA*.root/configurableAnalysis/eventV");
+    output_filename="CMS_QCD_MC_Pt100to250.root";
+  }
+  if(sample==2) {
+    chainB->Add("/data03/cfA/QCD_Pt250to500-madgraph_Summer09-MC_31X_V3_7TeV-v3_GEN-SIM-RECO_UCSB0181_v9/cfA*.root/configurableAnalysis/eventB");
+    chainV->Add("/data03/cfA/QCD_Pt250to500-madgraph_Summer09-MC_31X_V3_7TeV-v3_GEN-SIM-RECO_UCSB0181_v9/cfA*.root/configurableAnalysis/eventV");
+    output_filename="CMS_QCD_MC_Pt250to500.root";
+  }
+  if(sample==3) {
+    chainB->Add("/data03/cfA/QCD_Pt500to1000-madgraph_Summer09-MC_31X_V3_7TeV-v3_GEN-SIM-RECO_UCSB0182_v9/cfA*.root/configurableAnalysis/eventB");
+    chainV->Add("/data03/cfA/QCD_Pt500to1000-madgraph_Summer09-MC_31X_V3_7TeV-v3_GEN-SIM-RECO_UCSB0182_v9/cfA*.root/configurableAnalysis/eventV");
+    output_filename="CMS_QCD_MC_Pt500to1000.root";
+  }
+  if(sample==4) {
+    chainB->Add("/data03/cfA/QCD_Pt1000toInf-madgraph_Summer09-MC_31X_V3_7TeV-v3_GEN-SIM-RECO_UCSB0183_v9/cfA*.root/configurableAnalysis/eventB");
+    chainV->Add("/data03/cfA/QCD_Pt1000toInf-madgraph_Summer09-MC_31X_V3_7TeV-v3_GEN-SIM-RECO_UCSB0183_v9/cfA*.root/configurableAnalysis/eventV");
+    output_filename="CMS_QCD_MC_Pt1000toInf.root";
+  }
+  if(sample==5) {
+    chainB->Add("/data01/cfA/QCD_Pt30-herwigjimmy_Summer09-MC_31X_V3_7TeV-v1_GEN-SIM-RECO_UCSB0161_v9/cfA*.root/configurableAnalysis/eventB");
+    chainV->Add("/data01/cfA/QCD_Pt30-herwigjimmy_Summer09-MC_31X_V3_7TeV-v1_GEN-SIM-RECO_UCSB0161_v9/cfA*.root/configurableAnalysis/eventV");
+    output_filename="CMS_QCD_MC_Pthat30toInf.root";
+  }
+  if(sample==6) {
+    chainB->Add("/data01/cfA/QCD_Pt15-herwigjimmy_Summer09-MC_31X_V3_7TeV-v1_GEN-SIM-RECO_UCSB0168_v9/cfA*.root/configurableAnalysis/eventB");
+    chainV->Add("/data01/cfA/QCD_Pt15-herwigjimmy_Summer09-MC_31X_V3_7TeV-v1_GEN-SIM-RECO_UCSB0168_v9/cfA*.root/configurableAnalysis/eventV");
+    output_filename="CMS_QCD_MC_Pthat15toInf.root";
+  }
 
 
   // Initializes both Trees, i.e. set all the branch addresses, etc.
@@ -84,7 +84,7 @@ int flat_maker(){
   TTree* tree = new TTree("Event_Tree","Event Tree");    
   tree->Branch("run",&_run,"run/I");
   tree->Branch("event",&_event,"event/I");
-  tree->Branch("lumiblock",&_lumiblock,"lumiblock/I");	  
+  tree->Branch("lumiblock",&_lumiblock,"lumiblock/I");
   tree->Branch("met",&_met,"met/F");
   tree->Branch("metx",&_metx,"metx/F");
   tree->Branch("mety",&_mety,"mety/F");
@@ -107,7 +107,7 @@ int flat_maker(){
   tree->Branch("jet_fHPD",_jet_fHPD,"jet_fHPD[num_jet]/F");
   tree->Branch("jet_fRBX",_jet_fRBX,"jet_fRBX[num_jet]/F");
   tree->Branch("jet_n90Hits",_jet_n90Hits,"jet_n90Hits[num_jet]/I");
-  tree->Branch("jet_btag_jetProb",_jet_btag_jetProb,"jet_btag_jetProb[num_jet]/F");
+tree->Branch("jet_btag_jetProb",_jet_btag_jetProb,"jet_btag_jetProb[num_jet]/F");
   tree->Branch("jet_scalefac",_jet_scalefac,"jet_scalefac[num_jet]/F");
   tree->Branch("jet_remove",_jet_remove,"jet_remove[num_jet]/I");
   tree->Branch("ele1_et",&_ele1_et,"ele1_et/F");
@@ -188,6 +188,7 @@ int flat_maker(){
   tree->Branch("num_mu",&_num_mu,"num_mu/I");
 
 
+  /*
   //declare photon ntuple
   TTree* pho_tree = new TTree("Photon_Tree","Photon Tree");    
   pho_tree->Branch("run",&_run,"run/I");
@@ -208,15 +209,9 @@ int flat_maker(){
   pho_tree->Branch("pho_isoHollowTrkConeDR04",_pho_isoHollowTrkConeDR04,"pho_isoHollowTrkConeDR04[num_pho]/F");
   pho_tree->Branch("pho_maxEnergyXtal",_pho_maxEnergyXtal,"pho_maxEnergyXtal[num_pho]/F");
   pho_tree->Branch("pho_e3x3",_pho_e3x3,"pho_e3x3[num_pho]/F");
-
-  pho_tree->Branch("pho_sigmaIetaIeta",_pho_sigmaIetaIeta,"pho_sigmaIetaIeta[num_pho]/F");
-  pho_tree->Branch("pho_scPhiWidth",_pho_scPhiWidth,"pho_scPhiWidth[num_pho]/F");
-  pho_tree->Branch("pho_scEtaWidth",_pho_scEtaWidth,"pho_scEtaWidth[num_pho]/F");
-  pho_tree->Branch("pho_r9",_pho_r9,"pho_r9[num_pho]/F");
-
   pho_tree->Branch("pho_istight",_pho_istight,"pho_istight[num_pho]/I");
   pho_tree->Branch("pho_isloose",_pho_isloose,"pho_isloose[num_pho]/I");
-
+  */
 
 
 
@@ -249,18 +244,19 @@ int flat_maker(){
     chainB->GetEntry(ia);
     chainV->GetEntry(ia);
 
+
     //Physics Declared
     //if(!experimentType && !MC_flag) continue;
 
-    //Trigger Bits
-    if(!L1Bit_0 || (!L1Bit_40 && !L1Bit_41)) continue;
-    if(!HLT_Photon10_L1R) continue;
-    if(L1Bit_36 || L1Bit_37 || L1Bit_38 || L1Bit_39) continue; 
+   //Trigger Bits
+    //if(!L1Bit_0 || (!L1Bit_40 && !L1Bit_41)) continue;
+    //if(L1Bit_36 || L1Bit_37 || L1Bit_38 || L1Bit_39) continue; 
 
     //Require vertex
     if(Npv==0) continue;
-    else if(pv_ndof->at(0)<5 || fabs(pv_z->at(0))>15 ) continue;
+    else if(/*pv_ndof->at(0)<5 ||*/ fabs(pv_z->at(0))>15 ) continue;
 
+    /*
     //Reject Monster Events
     int num_highPurity = 0;
     if(Ntracks>10) {
@@ -269,26 +265,78 @@ int flat_maker(){
       }
       if((float)num_highPurity/Ntracks < 0.2) continue;
     }
+    */
 
 
     //Check good run list
-    if(!MC_flag && !inJSON(run,lumiblock)) continue;
+    // ****Put this into a function*************
+    /*
+    int good_run=0;
+    if(MC_flag) good_run=1;
+    if(run==133029 && lumiblock>=101 && lumiblock<=115 ) good_run=1;
+    else if(run==133029 && lumiblock>=129 && lumiblock<=350 ) good_run=1;
+    else if(run==132661 && lumiblock>=1 && lumiblock<=130 ) good_run=1;
+    else if(run==132662 && lumiblock>=1 && lumiblock<=130 ) good_run=1;
+    else if(run==132662 && lumiblock>=132 && lumiblock<=165 ) good_run=1;
+    else if(run==132599 && lumiblock>=1 && lumiblock<=379 ) good_run=1;
+    else if(run==132599 && lumiblock>=381 && lumiblock<=538 ) good_run=1;
+    else if(run==132440 && lumiblock>=157 && lumiblock<=401 ) good_run=1;
+    else if(run==132596 && lumiblock>=382 && lumiblock<=383 ) good_run=1;
+    else if(run==132596 && lumiblock>=447 && lumiblock<=453 ) good_run=1;
+    else if(run==132605 && lumiblock>=1 && lumiblock<=444 ) good_run=1;
+    else if(run==132605 && lumiblock>=446 && lumiblock<=622 ) good_run=1;
+    else if(run==132605 && lumiblock>=624 && lumiblock<=829 ) good_run=1;
+    else if(run==132605 && lumiblock>=831 && lumiblock<=968 ) good_run=1;
+    else if(run==132602 && lumiblock>=1 && lumiblock<=83 ) good_run=1;
+    else if(run==132601 && lumiblock>=1 && lumiblock<=207 ) good_run=1;
+    else if(run==132601 && lumiblock>=209 && lumiblock<=259 ) good_run=1;
+    else if(run==132601 && lumiblock>=261 && lumiblock<=1131 ) good_run=1;
+    else if(run==132959 && lumiblock>=1 && lumiblock<=276 ) good_run=1;
+    else if(run==132959 && lumiblock>=278 && lumiblock<=417 ) good_run=1;
+    else if(run==133158 && lumiblock>=65 && lumiblock<=786 ) good_run=1;
+    else if(run==132606 && lumiblock>=1 && lumiblock<=37 ) good_run=1;
+    else if(run==133036 && lumiblock>=1 && lumiblock<=225 ) good_run=1;
+    else if(run==133034 && lumiblock>=131 && lumiblock<=325 ) good_run=1;
+    else if(run==133035 && lumiblock>=1 && lumiblock<=306 ) good_run=1;
+    else if(run==133031 && lumiblock>=1 && lumiblock<=18 ) good_run=1;
+    else if(run==132968 && lumiblock>=1 && lumiblock<=173 ) good_run=1;
+    else if(run==132659 && lumiblock>=1 && lumiblock<=84 ) good_run=1;
+    else if(run==132658 && lumiblock>=1 && lumiblock<=177 ) good_run=1;
+    else if(run==132965 && lumiblock>=1 && lumiblock<=107 ) good_run=1;
+    else if(run==132961 && lumiblock>=1 && lumiblock<=427 ) good_run=1;
+    else if(run==132716 && lumiblock>=220 && lumiblock<=591 ) good_run=1;
+    else if(run==132716 && lumiblock>=593 && lumiblock<=640 ) good_run=1;
+    else if(run==132960 && lumiblock>=1 && lumiblock<=190 ) good_run=1;
+    else if(run==132598 && lumiblock>=80 && lumiblock<=82 ) good_run=1;
+    else if(run==132598 && lumiblock>=174 && lumiblock<=188 ) good_run=1;
+    else if(run==132656 && lumiblock>=1 && lumiblock<=140 ) good_run=1;
+    else if(run==133321 && lumiblock>=1 && lumiblock<=383 ) good_run=1;
+    else if(run==133046 && lumiblock>=1 && lumiblock<=43 ) good_run=1;
+    else if(run==133046 && lumiblock>=45 && lumiblock<=323 ) good_run=1;
+    if(!good_run) continue; 
+    */
 
 
     _run = run;
     _event = event;
-    _lumiblock = lumiblock;
+    _lumiblock = -999; //lumiblock;
     _met = mets_AK5_et->at(0);
     _metx = mets_AK5_et->at(0)*cos(mets_AK5_phi->at(0));
     _mety = mets_AK5_et->at(0)*sin(mets_AK5_phi->at(0));
     _metphi = mets_AK5_phi->at(0);
-    _rawmet = pfmets_et->at(0);
-    _rawmetphi = pfmets_phi->at(0);
+    _rawmet = 0;    //mets_SC5_et->at(0);
+    _rawmetphi = -999; //mets_SC5_phi->at(0);
     _vtxmet =  tcmets_et->at(0); 
     _vtxmetphi = tcmets_phi->at(0);
     if(_metphi<0) _metphi+=2*pi;
     _num_vert = Npv;
 
+
+    //Find Gen HT by looping through MC doc particles
+    //save gen HT as rawmet
+    for(int k=6; k<Nmc_doc; k++) {
+      _rawmet+= mc_doc_pt->at(k);
+    }
 
     // Clear old info from previous event
     _jet_et[0] = _jet_px[0] = _jet_py[0] = _jet_pz[0] = _jet_eta[0] = -999;
@@ -311,7 +359,7 @@ int flat_maker(){
 
     //loop through jets
     for (unsigned int k=0; k<jets_AK5_pt->size(); k++) {
-      if(jets_AK5_et->at(k)<10) continue;
+      if(jets_AK5_et->at(k)<30) continue;
       //if(fabs(jets_AK5_eta->at(k))>3.0) continue;
       //write out jet data
       float et = jets_AK5_et->at(k);
@@ -329,10 +377,10 @@ int flat_maker(){
       _jet_E[_num_jet]=sqrt(_jet_et[_num_jet]*_jet_et[_num_jet]
 				+_jet_pz[_num_jet]*_jet_pz[_num_jet]);
       _jet_emf[_num_jet]= jets_AK5_emf->at(k);
-      _jet_fHPD[_num_jet]= jets_AK5_fHPD->at(k);
-      _jet_fRBX[_num_jet]= jets_AK5_fRBX->at(k);
-      _jet_n90Hits[_num_jet]= jets_AK5_n90Hits->at(k);
-      _jet_btag_jetProb[_num_jet]= jets_AK5_btag_jetProb->at(k); 
+      _jet_fHPD[_num_jet]= 0.5; //jets_AK5_fHPD->at(k);
+      _jet_fRBX[_num_jet]= 0.5; //jets_AK5_fRBX->at(k);
+      _jet_n90Hits[_num_jet]= 2; //jets_AK5_n90Hits->at(k);
+      _jet_btag_jetProb[_num_jet]= jets_AK5_btag_jetProb->at(k);
       _jet_scalefac[_num_jet]= 1;
       _jet_remove[_num_jet]= 0;
       _num_jet++;
@@ -340,7 +388,7 @@ int flat_maker(){
 
 
     
-    /* //Don't look at electrons or muons
+    /*
 
     //loop through electrons
     for (unsigned int k=0; k<els_pt->size(); k++) {
@@ -395,10 +443,10 @@ int flat_maker(){
       } // Electron is good enough to save
     } //loop through electrons
 
-
+    */
     
 
-
+    /*
 
     //loop through muons
     for (unsigned int k=0; k<mus_pt->size(); k++) {
@@ -495,19 +543,18 @@ int flat_maker(){
       } // Muon is good enough to save
     } //loop through muons
 
-    */ //Don't look at electrons or muons
+    */
 
-
+    /*
 
     //loop through photons
     for (unsigned int k=0; k<photons_et->size(); k++) {
       if(photons_et->at(k) <10) continue;
-      //if(fabs(photons_eta->at(k))>3.0 || photons_isEBGap->at(k) || photons_isEEGap->at(k) || photons_isEBEEGap->at(k)) continue; 
+      if(fabs(photons_eta->at(k))>3.0 || photons_isEBGap->at(k) || photons_isEEGap->at(k) || photons_isEBEEGap->at(k)) continue; 
       //if(photons_isEBPho->at(k) && photons_maxEnergyXtal->at(k)/photons_e3x3->at(k)>0.9) continue;  //spike rejection
 
       // First check loose
       LoosePho[k]=true;
-      if(photons_isEBGap->at(k) || photons_isEEGap->at(k) || photons_isEBEEGap->at(k)) LoosePho[k]=false;
       if(photons_hadOverEM->at(k)>0.1) LoosePho[k]=false;
       if(photons_isoEcalRecHitDR04->at(k)>8.0+0.004*photons_et->at(k)) LoosePho[k]=false;
       if(photons_isoHcalRecHitDR04->at(k)>8.0+0.002*photons_et->at(k)) LoosePho[k]=false;
@@ -515,7 +562,6 @@ int flat_maker(){
 
       // Then check tight
       TightPho[k]=true;
-      if(photons_isEBGap->at(k) || photons_isEEGap->at(k) || photons_isEBEEGap->at(k)) TightPho[k]=false;
       if(photons_hadOverEM->at(k)>0.05) TightPho[k]=false;
       if(photons_isoEcalRecHitDR04->at(k)>4.2+0.002*photons_et->at(k)) TightPho[k]=false;
       if(photons_isoHcalRecHitDR04->at(k)>4.0+0.001*photons_et->at(k)) TightPho[k]=false;
@@ -524,7 +570,6 @@ int flat_maker(){
 
       int tightPho=0; int loosePho=0; int triggerPho=0;
       if(TightPho[k]) tightPho=1; if(LoosePho[k]) loosePho=1;
-      triggerPho=1;
       //if(TightPho[k] || LoosePho[k]) triggerPho=1;
 
      if (tightPho || loosePho || triggerPho) { // Photon is good enough to save
@@ -546,22 +591,19 @@ int flat_maker(){
        _pho_hasPixelSeed[_num_pho] = photons_hasPixelSeed->at(k);
        _pho_maxEnergyXtal[_num_pho] = photons_maxEnergyXtal->at(k);
        _pho_e3x3[_num_pho] = photons_e3x3->at(k);
-       _pho_sigmaIetaIeta[_num_pho] = photons_sigmaIetaIeta->at(k);
-       _pho_scPhiWidth[_num_pho] = photons_scPhiWidth->at(k);
-       _pho_scEtaWidth[_num_pho] = photons_scEtaWidth->at(k);
-       _pho_r9[_num_pho] = photons_r9->at(k);
        _pho_istight[_num_pho] = tightPho;
        _pho_isloose[_num_pho] = loosePho;
        _num_pho++;
      } // Photon is good enough to save
     } //loop through photons
 
+    */
 
 
     // Save this event
-    if (/*_num_mu==0 && _num_ele==0 &&*/ _num_jet>0 && _num_pho>0)  { //save event if at least one photon and at leaste one jet
+    if (/*_num_mu==0 && _num_ele==0 && _num_pho==0 && */ _num_jet>1)  { //save event if at least 2 jets
       tree->Fill();
-      pho_tree->Fill();
+      //pho_tree->Fill();
     }
 
   } //Main event loop
@@ -574,5 +616,4 @@ int flat_maker(){
 
 
 
-//Strange spikes in sigmaIetaIeta
-//t->Draw("pho_et","(pho_maxEnergyXtal/pho_e3x3)<0.9 && pho_istight && (pho_sigmaIetaIeta>0.01948 || pho_sigmaIetaIeta<0.01943) && (pho_sigmaIetaIeta>0.01941 || pho_sigmaIetaIeta<0.01937) && (pho_sigmaIetaIeta>0.0247 || pho_sigmaIetaIeta<0.0246) ")
+
