@@ -12,4 +12,5 @@ root.exe
 .L StandardHypoTestInvDemo.C+
 StandardHypoTestInvDemo("tight.root", "wspace", "SbModel","BModel", "data", 0, 3, true, 12, 6, 17, 5000)
 
+The observed limit determined by this code and used in the analysis was 8.8 events.  Running the code again should produce a similar but slightly different observed limit due to the finite number of toys at each point.
 
