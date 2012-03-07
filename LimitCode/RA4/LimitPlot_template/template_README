@@ -1,0 +1,15 @@
+This template is designed for overlaying the observed and expected limits from two different analyses in the tanbeta=10 CMSSM plane.  This template was created starting from the template from Ronny & Konstantin which can be found at https://twiki.cern.ch/twiki/bin/view/CMS/SUSY42XSUSYScan#mSUGRA_Templates.  The important addition here is the ability to overlay two different 1sigma expected limit bands.
+
+The limit curves are stored in the file template_DefineCurves.cc.  This example shows the combination of the Lepton Spectrum (LS) and Lepton Projection (LP) limits in RA4.
+
+The template runs out of the box with the command:
+root -l -b -q template_DrawCombinedLimits_Tanb10_M0lt2000.C
+
+
+Notes/Caveats:
+
+1) The template only covers M0<2000 GeV because it was originally created to meet the specific needs of RA4.
+
+2) As per the new SUSY prescription of separating theoretical uncertainties, the legend entries for the +/-1 sigma expected limit bands contain the word "exprt" to denote that the PDF and scale uncertainties are not included.
+
+3) The graph in LP_get5fbEnclosed_NLO_HT500() is drawn with a fill option to show the LP 1 sigma expected limit band.  It was necessary to make small adjustments to this graph so that its filled region matched the region delimited by the corresponding +/-1sigma theory curves.
