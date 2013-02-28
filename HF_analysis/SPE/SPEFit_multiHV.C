@@ -126,11 +126,11 @@ void SPEFit(char * fname, int run, int LED_amp, double cutmax = 250.0)
 	    fit->SetParLimits(4, fped->GetParameter(2), 100);
 	    
 	    
-	    hspe->Fit(fit, "MNQB", "", fped->GetParameter(1)+fped->GetParameter(2), cutmax);
+	    hspe->Fit(fit, "MNQBL", "", fped->GetParameter(1)+fped->GetParameter(2), cutmax);
 	    double maxfitrange = fped->GetParameter(1)+3*fped->GetParameter(3)+fped->GetParameter(4);
 	    //if(cutmax<maxfitrange) maxfitrange = cutmax;
 	    if(500<maxfitrange) maxfitrange = 500;
-	    hspe->Fit(fit, "MNQB", "", fped->GetParameter(1)+fped->GetParameter(2), maxfitrange);
+	    hspe->Fit(fit, "MNQBL", "", fped->GetParameter(1)+fped->GetParameter(2), maxfitrange);
 	    /*
 	      hspe->Fit(fit, "MNQB", "", fped->GetParameter(1)-fped->GetParameter(2), cutmax);
 	      double maxfitrange = fped->GetParameter(1)+3*fped->GetParameter(3)+fped->GetParameter(4);
@@ -168,6 +168,7 @@ void SPEFit(char * fname, int run, int LED_amp, double cutmax = 250.0)
 	    gPad->SetLogy(true);
 	    hspe->GetXaxis()->SetRangeUser(0, /*300*/200);
 	    hspe->Draw();
+	    fit->SetLineWidth(2);
 	    fit->Draw("same");
 	    
 	  }
