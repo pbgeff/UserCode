@@ -3,6 +3,7 @@
 #include "TF1.h"
 #include "TMath.h"
 #include "TCanvas.h"
+#include "TStyle.h"
 
 #include <vector>
 #include <utility>
@@ -18,6 +19,15 @@ Double_t FitFun(Double_t *x, Double_t *par);
 void SPEFit(char * fname, int run, int LED_amp, double cutmax = 250.0)
 {
 
+  //set plotting styles
+  gStyle->SetCanvasColor(0);
+  gStyle->SetPadColor(0);
+  gStyle->SetCanvasBorderMode(0);
+  gStyle->SetFrameBorderMode(0);
+  gStyle->SetStatColor(0);
+  gStyle->SetPadTickX(1);
+  gStyle->SetPadTickY(1);
+
     //set file names
     stringstream out_fname;
     out_fname<<"SPEconstants_Run_"<<run<<".txt";
@@ -27,14 +37,17 @@ void SPEFit(char * fname, int run, int LED_amp, double cutmax = 250.0)
     constants_file<<"type SPE"<<endl;
     constants_file<<"LED_amplitude "<<LED_amp<<endl<<endl;
 
-    constants_file<<endl<<"LED_amplitude HV Spigot Channel Ped_mean Ped_mean_err Ped_RMS  Ped_RMS_err SPEPeak_RMS SPEPeak_RMS_err Gain Gain_err Normalized_Chi2 MeanPE_fit MeanPE_fit_err MeanPE_estimate"<<endl;
+    constants_file<<endl<<"LED_amplitude HV Spigot Channel Ped_mean Ped_mean_err Ped_RMS  Ped_RMS_err SPEPeak_RMS SPEPeak_RMS_err Gain Gain_err Normalized_Chi2 MeanPE_fit MeanPE_fit_err MeanPE_estimate PE5flag"<<endl;
 
     out_fname.str("");
     out_fname<<"SPEdistributions_Run_"<<run<<".txt";
 
-    //ofstream  plots_file(out_fname.str().c_str(),ios_base::trunc);
-    //plots_file<<"Run "<<run<<endl;
-    //plots_file<<"type SPE"<<endl<<endl;
+    out_fname.str("");
+    out_fname<<"SPEextra_Run_"<<run<<".txt";
+    ofstream  extra_file(out_fname.str().c_str(),ios_base::trunc); 
+
+    //extra_file<<endl<<"LED_amplitude HV Spigot Channel PedSubtracted_mean Gain Gain_err MeanPE_fit MeanPE_fit_err MeanPE_estimate"<<endl;
+
 
     double scale = 1.0;
     scale = 2.6; //Need to scale up HF charge
@@ -44,7 +57,7 @@ void SPEFit(char * fname, int run, int LED_amp, double cutmax = 250.0)
     int cde[]={1,2,2,1,2,1,2,1,1,2,1,2,1,2,1,2,2,1,2,1,1,2,1,2};
     int ceta[]={39,39,40,40,37,37,38,38,36,36,35,35,34,34,33,33,31,31,32,32,30,30,29,29};
 
-    char spename[128], pedname[128];
+    char spename[128], pedname[128], spehistname[128];
     bool drawflag;   
  
     TFile *tf = new TFile(fname);
@@ -58,22 +71,59 @@ void SPEFit(char * fname, int run, int LED_amp, double cutmax = 250.0)
     c2->SetBorderMode(0);
     c2->SetBorderSize(0);  
 
+    //TCanvas *c3 = new TCanvas("c3","c3",500,500);
+
+    const int NnewBins = 106;
+    double binsX[NnewBins] = {0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,70,72,74,76,78,80,82,84,86,88,90,92,94,96,98,100,102,104,106,108,110,112,114,116,118,120,122,124,126,128,130,132,134,136,138,140,142,144,146,148,150,152,154,156,158,160,162,164,166,168,170,180,190,200,210,220,230,240,250,266,282,298,316,336,356,378,404,430,456,482,500};	  
+    TH1F* hspe = new TH1F("hspe","hspe",NnewBins-1,binsX);
+
+
     for(int HV=600; HV<=750; HV+=50) {
       drawflag=false;
 
       for (int iSpig = 0; iSpig < 2; iSpig++) {
-	for(int i = 0; i < 24; i++)
-	  {
+	for(int i = 0; i < 24; i++) {
+
+	    //if(iSpig!=0 || QIECh[i]!=24 || HV!=700) continue; //for debugging
+	    //cout<<"Spig "<<iSpig<<" Ch "<<i<<endl;
+
 	    sprintf (spename, "Analyzer/QIEsSumLED%d_QiECh_%d_DBOX_%d_eta_%d_D_%d", HV, QIECh[i], iSpig, ceta[i], cde[i]);
-	    TH1F *hspe = (TH1F *)tf->Get(spename);
+	    TH1F *hspe_temp = (TH1F *)tf->Get(spename);
 	    sprintf (pedname, "Analyzer/QIEsSumPED%d_QiECh_%d_DBOX_%d_eta_%d_D_%d", HV, QIECh[i], iSpig, ceta[i], cde[i]);
 	    TH1F *hped = (TH1F *)tf->Get(pedname);
+
+
+	    hspe->Reset();
+	    sprintf (spehistname, "SumLED%d_QiECh_%d_DBOX_%d_eta_%d_D_%d", HV, QIECh[i], iSpig, ceta[i], cde[i]);
+	    hspe->SetTitle(spehistname);
+
+	    //combine bins of original SPE histogram
+	    for(int ib=1; ib<=hspe_temp->GetNbinsX(); ib++) {
+	      double bin_center = hspe_temp->GetBinCenter(ib);
+	      if(bin_center>hspe->GetXaxis()->GetXmax()) continue;
+	      int newbin = hspe->FindBin(bin_center);
+	      double new_content = hspe->GetBinContent(newbin) + hspe_temp->GetBinContent(ib);
+	      double new_error = sqrt(pow(hspe->GetBinError(newbin),2)+pow(hspe_temp->GetBinError(ib),2));
+	      hspe->SetBinContent(newbin,new_content);
+	      hspe->SetBinError(newbin,new_error);
+	    }
+	    TH1F* hspe_unscaled = (TH1F*)hspe->Clone("hspe_unscaled");
+
+	    //renormalize bins of new SPE histogram
+	    for(int ib=1; ib<=hspe->GetNbinsX(); ib++) {
+	      double new_content = hspe->GetBinContent(ib)/hspe->GetXaxis()->GetBinWidth(ib)*hspe_temp->GetXaxis()->GetBinWidth(1);
+	      double new_error = hspe->GetBinError(ib)/hspe->GetXaxis()->GetBinWidth(ib)*hspe_temp->GetXaxis()->GetBinWidth(1);
+	      hspe->SetBinContent(ib,new_content);
+	      hspe->SetBinError(ib,new_error);
+	    }
 	    
-	    if(hspe->Integral()==0) continue;
+	    if(hspe_temp->Integral()==0) continue;
 	    else drawflag=true;	  
-	    
-	    Nev = hspe->Integral()*hspe->GetXaxis()->GetBinWidth(1);
-	    //cout<<"#Events in LED distribution "<<hspe->Integral()<<endl;
+    
+            Nev = hspe->Integral(1,hspe->GetNbinsX(),"width");
+	    //cout<<"Nev "<<Nev<<endl;
+	    //cout<<"hspe_temp Integral "<<hspe_temp->Integral(1,hspe_temp->FindBin(499),"width")<<endl;
+
 	    
 	    TF1 *fped = new TF1("fped","gaus",0, 80);
 	    hped->Fit(fped,"NQR");
@@ -107,56 +157,84 @@ void SPEFit(char * fname, int run, int LED_amp, double cutmax = 250.0)
 	    
 	    
 	    TF1 *fit = new TF1("fit", FitFun, 0, 500, 5);
-	    //fit->SetParameters(1, 20, 1, 40, 2);
-	    //fit->SetParameters(1, 20, 1, 22, 2);
-	    //fit->SetParameters(0.5, 20, 1, max_SPE_location-0.0*fped->GetParameter(1), 2);
 	    
 	    double mu = - log(fped->Integral(0,100)/Nev);
-	    
-	    if(max_SPE_bin > (minbin+1)) fit->SetParameters(/*0.5*/mu, 20, 1, max_SPE_location-1.0*fped->GetParameter(1), 10);
-	    else fit->SetParameters(/*0.5*/mu, 20, 1, 2.0*fped->GetParameter(2), 10); //case of no clear minimum; start looking for SPE peak at 2sigma away from pedestal peak
+	    if(mu<0) mu=0.01;
+	    double gain_est = max_SPE_location-1.0*fped->GetParameter(1);
+	    if(max_SPE_bin > (minbin+1)) fit->SetParameters(mu, 20, 1, gain_est, gain_est*0.5);
+	    else fit->SetParameters(mu, 20, 1, 2.1*fped->GetParameter(2), 10); //case of no clear minimum; start looking for SPE peak at 2sigma away from pedestal peak
+	    fit->SetParLimits(0, 0, 10);
 	    fit->FixParameter(1, fped->GetParameter(1));
 	    fit->FixParameter(2, fped->GetParameter(2));
-	    //fit->SetParameter(1, fped->GetParameter(1));
-	    //fit->SetParameter(2, fped->GetParameter(2));
-	    
-	    fit->SetParLimits(3, ppwidth*3, cutmax-pploc);
-	    //hspe->Fit(fit, "MNQB", "", cutmin, cutmax);
-	    
-	    fit->SetParLimits(4, fped->GetParameter(2), 100);
-	    
-	    
-	    hspe->Fit(fit, "MNQBL", "", fped->GetParameter(1)+fped->GetParameter(2), cutmax);
-	    double maxfitrange = fped->GetParameter(1)+3*fped->GetParameter(3)+fped->GetParameter(4);
-	    //if(cutmax<maxfitrange) maxfitrange = cutmax;
+	    fit->SetParLimits(3, fped->GetParameter(2)*2, 350);
+	    fit->SetParLimits(4, fped->GetParameter(2)*1.01, 250);
+
+	    double maxfitrange = 500.;    
+	    hspe->Fit(fit, "MNQL", "", 0, maxfitrange);
+	    //double maxfitrange = fped->GetParameter(1)+2*fit->GetParameter(3); //testing
 	    if(500<maxfitrange) maxfitrange = 500;
-	    hspe->Fit(fit, "MNQBL", "", fped->GetParameter(1)+fped->GetParameter(2), maxfitrange);
-	    /*
-	      hspe->Fit(fit, "MNQB", "", fped->GetParameter(1)-fped->GetParameter(2), cutmax);
-	      double maxfitrange = fped->GetParameter(1)+3*fped->GetParameter(3)+fped->GetParameter(4);
-	      if(cutmax<maxfitrange) maxfitrange = cutmax;
-	      hspe->Fit(fit, "MNQB", "", fped->GetParameter(1)-fped->GetParameter(2), maxfitrange);
-	    */
-	    
-	    //cout<<"estimate of gain "<<max_SPE_location-fped->GetParameter(1)<<", fit "<<fit->GetParameter(3)<<endl;
+	    double minfitrange = 0.;
+
+	    minfitrange = fped->GetParameter(1)+ 0.75*fit->GetParameter(3); 
+	    //cout<<"minfitrange "<<minfitrange<<endl;
+            fit->SetParLimits(0, 0, fit->GetParameter(0)*1.1);
+            fit->SetParLimits(4, fped->GetParameter(2)*1.01, fit->GetParameter(4)*1.01);
+	    hspe->Fit(fit, "MNQL", "", minfitrange, maxfitrange);
+	    minfitrange = fped->GetParameter(1)+ 0.75*fit->GetParameter(3); 
+	    //cout<<"minfitrange "<<minfitrange<<endl;
+	    hspe->Fit(fit, "MNQL", "", minfitrange, maxfitrange);
+
+	    //calculate NDOF of fit excluding bins with 0 entries
+	    int myNDOF=-3; //three free parameters
+	    for(int j=hspe->FindBin(minfitrange); j<=hspe->FindBin(maxfitrange); j++) { //loop through fitted spe bins
+	      if(hspe->GetBinContent(j)) myNDOF++;
+            } //loop through fitted spe bins
+
+
+	    //cout<<"estimate of gain "<<gain_est<<", fit "<<fit->GetParameter(3)<<endl;
+	    //cout<<"SPE width "<<fit->GetParameter(4)<<endl;
 	    //cout<<"Fit normalization constant: estimate "<<mu<<" fit "<<fit->GetParameter(0)<<endl;
 	    //cout<<spename<<endl;
 
-	    //output calibrations constants
-	    //constants_file<<endl<<"LED_amplitude HV Spigot Channel Ped_mean Ped_mean_err Ped_RMS  Ped_RMS_err SPEPeak_RMS SPEPeak_RMS_err Gain Gain_err Normalized_Chi2 MeanPE_fit MeanPE_fit_err MeanPE_estimate"<<endl;
-	    constants_file<<LED_amp<<" "<<HV<<" "<<iSpig<<" "<<QIECh[i]<<" "<<scale*fped->GetParameter(1)<<" "<<scale*fped->GetParError(1)<<" "<<scale*fped->GetParameter(2)<<" "<<scale*fped->GetParError(2)<<" "<<scale*fit->GetParameter(4)<<" "<<scale*fit->GetParError(4)<<" "<<scale*fit->GetParameter(3)*fC2electrons<<" "<<scale*fit->GetParError(3)*fC2electrons<<" "<<fit->GetChisquare()/fit->GetNDF()<<" "<<fit->GetParameter(0)<<" "<<fit->GetParError(0)<<" "<<mu<<endl;
+
+	    //calculate means and integrals of the fit and data
+	    double fint, fint_error, hint, favg, havg;
+	    int temp_lowbin, temp_highbin;
+	    temp_lowbin = hspe->FindBin(minfitrange);
+	    temp_highbin = hspe->FindBin(maxfitrange);
+	    hspe_unscaled->GetXaxis()->SetRangeUser(minfitrange, maxfitrange);
+	    havg = hspe_unscaled->GetMean();
+	    hint = hspe->Integral(temp_lowbin,temp_highbin,"width");
+	    double min_frange = hspe->GetBinLowEdge(temp_lowbin);
+	    favg = fit->Mean(min_frange, maxfitrange);
+	    fint = fit->Integral(min_frange, maxfitrange);
+	    fint_error = fit->IntegralError(min_frange, maxfitrange);
 	    
+	    double PE5int = 0; //integral of events with >=5 PE
+	    double PE5loc =  fped->GetParameter(1)+ 5*fit->GetParameter(3);
+	    if(PE5loc>500) PE5int = 0;
+	    else {
+	      int PE5bin =  hspe_temp->FindBin(PE5loc);
+	      temp_highbin = hspe_temp->FindBin(maxfitrange)-1;
+	      PE5int =  hspe_temp->Integral(PE5bin,temp_highbin,"width");
+	    }
+	    int PE5flag = 0;
+	    if(PE5int/hint>0.05) PE5flag = 1; //set flag if more than 5% of events in the fit correspond to >=5PE
+
+
+	    //output calibrations constants
+	    //constants_file<<endl<<"LED_amplitude HV Spigot Channel Ped_mean Ped_mean_err Ped_RMS  Ped_RMS_err SPEPeak_RMS SPEPeak_RMS_err Gain Gain_err Normalized_Chi2 MeanPE_fit MeanPE_fit_err MeanPE_estimate PE5flag"<<endl;
+	    constants_file<<LED_amp<<" "<<HV<<" "<<iSpig<<" "<<QIECh[i]<<" "<<scale*fped->GetParameter(1)<<" "<<scale*fped->GetParError(1)<<" "<<scale*fped->GetParameter(2)<<" "<<scale*fped->GetParError(2)<<" "<<scale*fit->GetParameter(4)<<" "<<scale*fit->GetParError(4)<<" "<<scale*fit->GetParameter(3)*fC2electrons<<" "<<scale*fit->GetParError(3)*fC2electrons<<" "<<fit->GetChisquare()/myNDOF/*fit->GetNDF()*/<<" "<<fit->GetParameter(0)<<" "<<fit->GetParError(0)<<" "<<mu<<" "<<PE5flag<<endl;
+
+//	    cout<<LED_amp<<" "<<HV<<" "<<iSpig<<" "<<QIECh[i]<<" "<<scale*fped->GetParameter(1)<<" "<<scale*fped->GetParError(1)<<" "<<scale*fped->GetParameter(2)<<" "<<scale*fped->GetParError(2)<<" "<<scale*fit->GetParameter(4)<<" "<<scale*fit->GetParError(4)<<" "<<scale*fit->GetParameter(3)*fC2electrons<<" "<<scale*fit->GetParError(3)*fC2electrons<<" "<<fit->GetChisquare()/fit->GetNDF()<<" "<<fit->GetChisquare()<<" "<<fit->GetNDF()<<" "<<myNDOF<<" "<<fit->GetParameter(0)<<" "<<fit->GetParError(0)<<" "<<mu<<endl;
+	   
+	    //extra_file<<endl<<"LED_amplitude HV Spigot Channel SignalAvg_inFitRange FitAvg_inFitRange SignalInt_inFitRange FitInt_inFitRange PEge5Int Gain(fC) Gain_err MeanPE_fit MeanPE_fit_err MeanPE_estimate"<<endl;
+	    //extra_file<<LED_amp<<" "<<HV<<" "<<iSpig<<" "<<QIECh[i]<<" "<<scale*havg<<" "<<scale*favg<<" "<<hint<<" "<<fint<<" "<<PE5int<<" "<<scale*fit->GetParameter(3)<<" "<<scale*fit->GetParError(3)<<" "<<fit->GetParameter(0)<<" "<<fit->GetParError(0)<<" "<<mu<<" "<<PE5flag<<endl;
+
+
 	    //cout<<"# Spigot Channel Ped_mean Ped_RMS SPE_PeakRMS Gain Normalized_Chi2 Avg_PE"<<endl;
 	    //cout<<iSpig<<" "<<i<<" "<<scale*fped->GetParameter(1)<<" "<<scale*fped->GetParameter(2)<<" "<<scale*fit->GetParameter(4)<<" "<<scale*fit->GetParameter(3)*fC2electrons<<" "<<fit->GetChisquare()/fit->GetNDF()<<" "<<fit->GetParameter(0)<<endl<<endl;
 	    
-	    //dump plot and fit to text file
-	    //plots_file<<"Spigot "<<iSpig<<" Channel "<<i<<endl; 
-	    //plots_file<<"Energy Sum"<<endl;
-	    Nbins = hspe->GetBin(cutmax);
-	    //for(int ia=1; ia < Nbins; ia++) plots_file<<scale*hspe->GetBinCenter(ia)<<" "<<hspe->GetBinContent(ia)<<endl;
-	    //plots_file<<endl<<"SPE fit"<<endl;
-	    //for(int ia=1; ia < Nbins; ia++) plots_file<<scale*hspe->GetBinCenter(ia)<<" "<<fit->Eval(hspe->GetBinCenter(ia))<<endl;
-	    //plots_file<<endl;
 	    
 	  
 	    if(iSpig==0) c1->cd(i+1);
@@ -166,11 +244,29 @@ void SPEFit(char * fname, int run, int LED_amp, double cutmax = 250.0)
 	    gPad->SetRightMargin(0.01);
 	    gPad->SetBottomMargin(0.1);
 	    gPad->SetLogy(true);
-	    hspe->GetXaxis()->SetRangeUser(0, /*300*/200);
-	    hspe->Draw();
+	    hspe->GetXaxis()->SetRangeUser(0, /*300*/508);
+	    hspe->SetLineColor(kBlue);
+	    hspe->DrawClone("hist");
 	    fit->SetLineWidth(2);
 	    fit->Draw("same");
-	    
+	   
+	    /*
+	    c3->cd();
+	    gPad->SetBorderMode(0);
+	    gPad->SetBorderSize(0);
+	    gPad->SetRightMargin(0.01);
+	    gPad->SetBottomMargin(0.1);
+	    gPad->SetLogy(true);
+	    hspe->GetXaxis()->SetRangeUser(0, 300);
+	    hspe->Draw();
+	    fit->SetLineWidth(1);
+	    fit->SetLineColor(2);
+	    fit->Draw("same");
+            stringstream plot_name;
+	    plot_name<<"Plots/Channels/Spig"<<iSpig<<"_Chan"<<QIECh[i]<<"_HV"<<HV<<"_LED"<<LED_amp<<"_Run_"<<run<<"_SPEFit.pdf";
+	    //c3->SaveAs(plot_name.str().c_str());
+	    plot_name.str( std::string() );
+	    */
 	  }
       }
 
@@ -185,18 +281,20 @@ void SPEFit(char * fname, int run, int LED_amp, double cutmax = 250.0)
 
     } //HV loop
 
-    //plots_file.close();    
-    constants_file.close();
+    delete c1;
+    delete c2;
+    //delete c3;
 
+    constants_file.close();
 }
 
 Double_t FitFun(Double_t *x, Double_t *par)
 {
 // Spectra fit function: Pedestal Gaussian + asymmetric 1PE + 2PE +3PE peaks
         
-  Double_t sum,xx,A0,C0,r0,sigma0,mean1,sigma1,A1,C1,r1,mean2,sigma2,A2,C2,r2,mean3,sigma3,A3,C3,r3;
+  Double_t sum,xx,A0,C0,r0,sigma0,mean1,sigma1,A1,C1,r1,mean2,sigma2,A2,C2,r2,mean3,sigma3,A3,C3,r3,mean4,sigma4,A4,C4,r4;
         
-  const Double_t k0=2.0, k1=1.6, k2=2.0;
+  const Double_t k0=2.0, k1=1.6, k2=2.0, k3=2.0, k4=2.0;
         
   xx=x[0];  
   sigma0 = par[2];
@@ -231,13 +329,30 @@ Double_t FitFun(Double_t *x, Double_t *par)
   else if(r2 < k2 && xx<par[1]) sum += 0;
   else sum += C2*A2*TMath::Exp(0.5*k2*k2-k2*r2);
 
-
+ 
   mean3 = 3*par[3]+par[1];
   sigma3 = sqrt(3*sigma1*sigma1 - 2*pow(par[2],2));
   A3 = A0*par[0]*par[0]*par[0]/6;
-  C3 = 1/(sigma3*sqrt(2*3.14159));
-  r3 = ((xx-mean3)/sigma3);
-  if(xx>par[1]-3.0*par[2]) sum += C3*A3*TMath::Exp(-0.5*r3*r3);
+  //C3 = 1/(sigma3*sqrt(2*3.14159));
+  C3 = 1/(sigma3* TMath::Exp(-k3*k3/2)/k3 + 
+	  sigma3*sqrt(2*3.14159)*0.5*(1+TMath::Erf(k3/1.41421)));
+    r3 = ((xx-mean3)/sigma3);
+  if(r3 < k3 && xx>par[1]-3.0*par[2]) sum += C3*A3*TMath::Exp(-0.5*r3*r3);
+  else if(r3 < k3 && xx<par[1]) sum += 0;
+  else sum += C3*A3*TMath::Exp(0.5*k3*k3-k3*r3); 
+  
+
+  mean4 = 4*par[3]+par[1];
+  sigma4 = sqrt(4*sigma1*sigma1 - 3*pow(par[2],2));
+  A4 = A0*par[0]*par[0]*par[0]*par[0]/24;
+  //C4 = 1/(sigma4*sqrt(2*3.14159));
+  C4 = 1/(sigma4* TMath::Exp(-k4*k4/2)/k4 + 
+	  sigma4*sqrt(2*3.14159)*0.5*(1+TMath::Erf(k4/1.41421)));
+  r4 = ((xx-mean4)/sigma4);
+  if(r4 < k4 && xx>par[1]-3.0*par[2]) sum += C4*A4*TMath::Exp(-0.5*r4*r4);
+  else if(r4 < k4 && xx<par[1]) sum += 0;
+  else sum += C4*A4*TMath::Exp(0.5*k4*k4-k4*r4);
+  
 
   return sum;
 }
