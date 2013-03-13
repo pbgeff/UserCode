@@ -175,14 +175,17 @@ void SPEFit(char * fname, int run, int LED_amp, double cutmax = 250.0)
 	    if(500<maxfitrange) maxfitrange = 500;
 	    double minfitrange = 0.;
 
-	    minfitrange = fped->GetParameter(1)+ 0.75*fit->GetParameter(3); 
-	    //cout<<"minfitrange "<<minfitrange<<endl;
-            fit->SetParLimits(0, 0, fit->GetParameter(0)*1.1);
-            fit->SetParLimits(4, fped->GetParameter(2)*1.01, fit->GetParameter(4)*1.01);
-	    hspe->Fit(fit, "MNQL", "", minfitrange, maxfitrange);
-	    minfitrange = fped->GetParameter(1)+ 0.75*fit->GetParameter(3); 
-	    //cout<<"minfitrange "<<minfitrange<<endl;
-	    hspe->Fit(fit, "MNQL", "", minfitrange, maxfitrange);
+	    //cout<<fit->GetParameter(3)<<" "<<fped->GetParameter(2)*2<<endl;
+	    if(fit->GetParameter(3)>fped->GetParameter(2)*2.001){ //If fitted gain is greater than minimum allowed value
+	      minfitrange = fped->GetParameter(1)+ 0.75*fit->GetParameter(3); 
+	      //cout<<"minfitrange "<<minfitrange<<endl;
+	      fit->SetParLimits(0, 0, fit->GetParameter(0)*1.1);
+	      fit->SetParLimits(4, fped->GetParameter(2)*1.01, fit->GetParameter(4)*1.01);
+	      hspe->Fit(fit, "MNQL", "", minfitrange, maxfitrange);
+	      minfitrange = fped->GetParameter(1)+ 0.75*fit->GetParameter(3); 
+	      //cout<<"minfitrange "<<minfitrange<<endl;
+	      hspe->Fit(fit, "MNQL", "", minfitrange, maxfitrange);
+	    }
 
 	    //calculate NDOF of fit excluding bins with 0 entries
 	    int myNDOF=-3; //three free parameters
@@ -208,7 +211,7 @@ void SPEFit(char * fname, int run, int LED_amp, double cutmax = 250.0)
 	    double min_frange = hspe->GetBinLowEdge(temp_lowbin);
 	    favg = fit->Mean(min_frange, maxfitrange);
 	    fint = fit->Integral(min_frange, maxfitrange);
-	    fint_error = fit->IntegralError(min_frange, maxfitrange);
+	    //fint_error = fit->IntegralError(min_frange, maxfitrange);
 	    
 	    double PE5int = 0; //integral of events with >=5 PE
 	    double PE5loc =  fped->GetParameter(1)+ 5*fit->GetParameter(3);
