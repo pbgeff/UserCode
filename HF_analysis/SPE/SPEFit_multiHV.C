@@ -120,8 +120,10 @@ void SPEFit(char * fname, int run, int LED_amp, double cutmax = 250.0)
 	    if(hspe_temp->Integral()==0) continue;
 	    else drawflag=true;	  
     
-            Nev = hspe->Integral(1,hspe->GetNbinsX(),"width");
+            //Nev = hspe->Integral(1,hspe->GetNbinsX(),"width");
+            Nev = hspe_temp->Integral()*hspe_temp->GetXaxis()->GetBinWidth(1); 
 	    //cout<<"Nev "<<Nev<<endl;
+	    //cout<<"Nev_new "<<(int)hspe_temp->Integral()*hspe_temp->GetXaxis()->GetBinWidth(1)<<endl;
 	    //cout<<"hspe_temp Integral "<<hspe_temp->Integral(1,hspe_temp->FindBin(499),"width")<<endl;
 
 	    
@@ -169,23 +171,13 @@ void SPEFit(char * fname, int run, int LED_amp, double cutmax = 250.0)
 	    fit->SetParLimits(3, fped->GetParameter(2)*2, 350);
 	    fit->SetParLimits(4, fped->GetParameter(2)*1.01, 250);
 
-	    double maxfitrange = 500.;    
-	    hspe->Fit(fit, "MNQL", "", 0, maxfitrange);
-	    //double maxfitrange = fped->GetParameter(1)+2*fit->GetParameter(3); //testing
-	    if(500<maxfitrange) maxfitrange = 500;
-	    double minfitrange = 0.;
 
-	    //cout<<fit->GetParameter(3)<<" "<<fped->GetParameter(2)*2<<endl;
-	    if(fit->GetParameter(3)>fped->GetParameter(2)*2.001){ //If fitted gain is greater than minimum allowed value
-	      minfitrange = fped->GetParameter(1)+ 0.75*fit->GetParameter(3); 
-	      //cout<<"minfitrange "<<minfitrange<<endl;
-	      fit->SetParLimits(0, 0, fit->GetParameter(0)*1.1);
-	      fit->SetParLimits(4, fped->GetParameter(2)*1.01, fit->GetParameter(4)*1.01);
-	      hspe->Fit(fit, "MNQL", "", minfitrange, maxfitrange);
-	      minfitrange = fped->GetParameter(1)+ 0.75*fit->GetParameter(3); 
-	      //cout<<"minfitrange "<<minfitrange<<endl;
-	      hspe->Fit(fit, "MNQL", "", minfitrange, maxfitrange);
-	    }
+	    double maxfitrange = 500.;    
+	    double minfitrange = 0.;
+	    hspe->Fit(fit, "MNQL", "", minfitrange, maxfitrange);
+            maxfitrange = fped->GetParameter(1)+4*fit->GetParameter(3)+fit->GetParameter(4);
+            if(500<maxfitrange) maxfitrange = 500;
+            hspe->Fit(fit, "MNQL", "", minfitrange, maxfitrange);
 
 	    //calculate NDOF of fit excluding bins with 0 entries
 	    int myNDOF=-3; //three free parameters
@@ -232,7 +224,7 @@ void SPEFit(char * fname, int run, int LED_amp, double cutmax = 250.0)
 //	    cout<<LED_amp<<" "<<HV<<" "<<iSpig<<" "<<QIECh[i]<<" "<<scale*fped->GetParameter(1)<<" "<<scale*fped->GetParError(1)<<" "<<scale*fped->GetParameter(2)<<" "<<scale*fped->GetParError(2)<<" "<<scale*fit->GetParameter(4)<<" "<<scale*fit->GetParError(4)<<" "<<scale*fit->GetParameter(3)*fC2electrons<<" "<<scale*fit->GetParError(3)*fC2electrons<<" "<<fit->GetChisquare()/fit->GetNDF()<<" "<<fit->GetChisquare()<<" "<<fit->GetNDF()<<" "<<myNDOF<<" "<<fit->GetParameter(0)<<" "<<fit->GetParError(0)<<" "<<mu<<endl;
 	   
 	    //extra_file<<endl<<"LED_amplitude HV Spigot Channel SignalAvg_inFitRange FitAvg_inFitRange SignalInt_inFitRange FitInt_inFitRange PEge5Int Gain(fC) Gain_err MeanPE_fit MeanPE_fit_err MeanPE_estimate"<<endl;
-	    //extra_file<<LED_amp<<" "<<HV<<" "<<iSpig<<" "<<QIECh[i]<<" "<<scale*havg<<" "<<scale*favg<<" "<<hint<<" "<<fint<<" "<<PE5int<<" "<<scale*fit->GetParameter(3)<<" "<<scale*fit->GetParError(3)<<" "<<fit->GetParameter(0)<<" "<<fit->GetParError(0)<<" "<<mu<<" "<<PE5flag<<endl;
+	    //extra_file<<LED_amp<<" "<<HV<<" "<<iSpig<<" "<<QIECh[i]<<" "<<scale*havg<<" "<<scale*favg<<" "<<hint<<" "<<fint<<" "<<PE5int<<" "<<scale*fit->GetParameter(3)<<" "<<scale*fit->GetParError(3)<<" "<<fit->GetChisquare()/myNDOF<<" "<<fit->GetParameter(0)<<" "<<fit->GetParError(0)<<" "<<mu<<" "<<PE5flag<<endl;
 
 
 	    //cout<<"# Spigot Channel Ped_mean Ped_RMS SPE_PeakRMS Gain Normalized_Chi2 Avg_PE"<<endl;
